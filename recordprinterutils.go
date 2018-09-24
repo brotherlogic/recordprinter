@@ -1,6 +1,5 @@
 package main
 
-import "golang.org/x/net/context"
+func run() {
 
-func (s *Server) moveLoop(ctx context.Context) {
 }
