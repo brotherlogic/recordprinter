@@ -5,23 +5,74 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"strconv"
 
 	"github.com/brotherlogic/goserver"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
 	pbg "github.com/brotherlogic/goserver/proto"
+	"github.com/brotherlogic/goserver/utils"
+	pbp "github.com/brotherlogic/printer/proto"
+	pbrm "github.com/brotherlogic/recordmover/proto"
 )
+
+// Bridge link to other services
+type Bridge interface {
+	getMoves(ctx context.Context) ([]*pbrm.RecordMove, error)
+	print(ctx context.Context, text string) error
+}
+
+type prodBridge struct{}
+
+func (p *prodBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
+	host, port, err := utils.Resolve("recordmover")
+	if err != nil {
+		log.Fatalf("Unable to reach organiser: %v", err)
+	}
+	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
+	defer conn.Close()
+
+	if err != nil {
+		log.Fatalf("Unable to dial: %v", err)
+	}
+
+	client := pbrm.NewMoveServiceClient(conn)
+	resp, err := client.ListMoves(ctx, &pbrm.ListRequest{})
+	if err != nil {
+		return nil, err
+	}
+	return resp.Moves, err
+}
+
+func (p *prodBridge) print(ctx context.Context, text string) error {
+	host, port, err := utils.Resolve("printer")
+	if err != nil {
+		log.Fatalf("Unable to reach organiser: %v", err)
+	}
+	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
+	defer conn.Close()
+
+	if err != nil {
+		log.Fatalf("Unable to dial: %v", err)
+	}
+
+	client := pbp.NewPrintServiceClient(conn)
+	_, err = client.Print(ctx, &pbp.PrintRequest{Text: text})
+	return err
+}
 
 //Server main server type
 type Server struct {
 	*goserver.GoServer
+	bridge Bridge
 }
 
 // Init builds the server
 func Init() *Server {
 	s := &Server{
 		&goserver.GoServer{},
+		&prodBridge{},
 	}
 	return s
 }
@@ -59,6 +110,9 @@ func main() {
 	server.PrepServer()
 	server.Register = server
 	server.RegisterServer("recordprinter", false)
+
+	//server.RegisterRepeatingTask(server.moveLoop, "move_loop", time.Hour)
+
 	server.Log("Starting!")
 	fmt.Printf("%v", server.Serve())
 }
