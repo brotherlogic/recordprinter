@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"strconv"
+	"time"
 
 	"github.com/brotherlogic/goserver"
 	"golang.org/x/net/context"
@@ -111,7 +112,7 @@ func main() {
 	server.Register = server
 	server.RegisterServer("recordprinter", false)
 
-	//server.RegisterRepeatingTask(server.moveLoop, "move_loop", time.Hour)
+	server.RegisterRepeatingTask(server.moveLoop, "move_loop", time.Hour)
 
 	server.Log("Starting!")
 	fmt.Printf("%v", server.Serve())
