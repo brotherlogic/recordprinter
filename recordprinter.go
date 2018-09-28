@@ -67,6 +67,7 @@ func (p *prodBridge) print(ctx context.Context, text string) error {
 type Server struct {
 	*goserver.GoServer
 	bridge Bridge
+	count  int64
 }
 
 // Init builds the server
@@ -74,6 +75,7 @@ func Init() *Server {
 	s := &Server{
 		&goserver.GoServer{},
 		&prodBridge{},
+		0,
 	}
 	return s
 }
@@ -95,7 +97,9 @@ func (s *Server) Mote(ctx context.Context, master bool) error {
 
 // GetState gets the state of the server
 func (s *Server) GetState() []*pbg.State {
-	return []*pbg.State{}
+	return []*pbg.State{
+		&pbg.State{Key: "count", Value: s.count},
+	}
 }
 
 func main() {

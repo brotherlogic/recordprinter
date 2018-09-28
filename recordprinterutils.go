@@ -7,6 +7,7 @@ import (
 )
 
 func (s *Server) moveLoop(ctx context.Context) {
+	s.count++
 	moves, err := s.bridge.getMoves(ctx)
 
 	if err != nil {
