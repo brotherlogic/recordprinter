@@ -17,11 +17,16 @@ func (s *Server) moveLoop(ctx context.Context) {
 
 	for _, move := range moves {
 		s.Log(fmt.Sprintf("MOVE: %v", move.InstanceId))
-		/*err := s.bridge.print(ctx, fmt.Sprintf("MOVE: %v", move.InstanceId))
+		err := s.bridge.print(ctx, fmt.Sprintf("MOVE: %v", move.InstanceId))
 
 		if err != nil {
 			s.Log(fmt.Sprintf("Error printing move: %v", err))
 			return
-		}*/
+		}
+
+		err = s.bridge.clearMove(ctx, move)
+		if err != nil {
+			s.Log(fmt.Sprintf("Error clearing move: %v", err))
+		}
 	}
 }
