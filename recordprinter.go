@@ -21,6 +21,7 @@ import (
 // Bridge link to other services
 type Bridge interface {
 	getMoves(ctx context.Context) ([]*pbrm.RecordMove, error)
+	clearMove(ctx context.Context, move *pbrm.RecordMove) error
 	print(ctx context.Context, text string) error
 }
 
@@ -44,6 +45,23 @@ func (p *prodBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
 		return nil, err
 	}
 	return resp.Moves, err
+}
+
+func (p *prodBridge) clearMove(ctx context.Context, move *pbrm.RecordMove) error {
+	host, port, err := utils.Resolve("recordmover")
+	if err != nil {
+		log.Fatalf("Unable to reach organiser: %v", err)
+	}
+	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
+	defer conn.Close()
+
+	if err != nil {
+		log.Fatalf("Unable to dial: %v", err)
+	}
+
+	client := pbrm.NewMoveServiceClient(conn)
+	_, err = client.ClearMove(ctx, &pbrm.ClearRequest{InstanceId: move.InstanceId})
+	return err
 }
 
 func (p *prodBridge) print(ctx context.Context, text string) error {
