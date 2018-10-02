@@ -30,13 +30,13 @@ type prodBridge struct{}
 func (p *prodBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
 	host, port, err := utils.Resolve("recordmover")
 	if err != nil {
-		log.Fatalf("Unable to reach organiser: %v", err)
+		return nil, err
 	}
 	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
 	defer conn.Close()
 
 	if err != nil {
-		log.Fatalf("Unable to dial: %v", err)
+		return nil, err
 	}
 
 	client := pbrm.NewMoveServiceClient(conn)
@@ -50,13 +50,13 @@ func (p *prodBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
 func (p *prodBridge) clearMove(ctx context.Context, move *pbrm.RecordMove) error {
 	host, port, err := utils.Resolve("recordmover")
 	if err != nil {
-		log.Fatalf("Unable to reach organiser: %v", err)
+		return nil, err
 	}
 	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
 	defer conn.Close()
 
 	if err != nil {
-		log.Fatalf("Unable to dial: %v", err)
+		return nil, err
 	}
 
 	client := pbrm.NewMoveServiceClient(conn)
@@ -67,13 +67,13 @@ func (p *prodBridge) clearMove(ctx context.Context, move *pbrm.RecordMove) error
 func (p *prodBridge) print(ctx context.Context, text string) error {
 	host, port, err := utils.Resolve("printer")
 	if err != nil {
-		log.Fatalf("Unable to reach organiser: %v", err)
+		return nil, err
 	}
 	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
 	defer conn.Close()
 
 	if err != nil {
-		log.Fatalf("Unable to dial: %v", err)
+		return nil, err
 	}
 
 	client := pbp.NewPrintServiceClient(conn)
