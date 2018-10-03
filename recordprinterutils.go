@@ -17,7 +17,12 @@ func (s *Server) moveLoop(ctx context.Context) {
 
 	for _, move := range moves {
 		s.Log(fmt.Sprintf("MOVE: %v", move.InstanceId))
-		err := s.bridge.print(ctx, fmt.Sprintf("MOVE: %v", move.InstanceId))
+		lines, err := s.bridge.resolve(ctx, move)
+		if err != nil {
+			s.Log(fmt.Sprintf("Error getting move: %v", err))
+			return
+		}
+		err = s.bridge.print(ctx, lines)
 
 		if err != nil {
 			s.Log(fmt.Sprintf("Error printing move: %v", err))
