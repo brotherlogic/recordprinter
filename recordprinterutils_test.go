@@ -10,9 +10,17 @@ import (
 )
 
 type testBridge struct {
-	failMove  bool
-	failPrint bool
-	failClear bool
+	failMove    bool
+	failPrint   bool
+	failClear   bool
+	failResolve bool
+}
+
+func (t *testBridge) resolve(ctx context.Context, move *pbrm.RecordMove) ([]string, error) {
+	if t.failResolve {
+		return []string{}, fmt.Errorf("Built to fail")
+	}
+	return []string{"hello", "there"}, nil
 }
 
 func (t *testBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
@@ -28,7 +36,7 @@ func (t *testBridge) clearMove(ctx context.Context, move *pbrm.RecordMove) error
 	return nil
 }
 
-func (t *testBridge) print(ctx context.Context, text string) error {
+func (t *testBridge) print(ctx context.Context, lines []string) error {
 	if t.failPrint {
 		return fmt.Errorf("Built to fail")
 	}
@@ -56,6 +64,13 @@ func TestMoveFail(t *testing.T) {
 func TestPrintFail(t *testing.T) {
 	s := InitTestServer()
 	s.bridge = &testBridge{failPrint: true}
+	s.moveLoop(context.Background())
+
+}
+
+func TestResolveFail(t *testing.T) {
+	s := InitTestServer()
+	s.bridge = &testBridge{failResolve: true}
 	s.moveLoop(context.Background())
 
 }
