@@ -149,12 +149,11 @@ func (p *prodBridge) resolve(ctx context.Context, move *pbrm.RecordMove) ([]stri
 		return []string{}, err
 	}
 
-	return []string{
-		fmt.Sprintf("%v: %v -> %v\n", r.GetRelease().Title, f1, f2),
-		loc[0],
-		loc[1],
-		loc[2],
-	}, nil
+	strret := []string{fmt.Sprintf("%v: %v -> %v\n", r.GetRelease().Title, f1, f2)}
+	for _, v := range loc {
+		strret = append(strret, v)
+	}
+	return strret, nil
 }
 
 func (p *prodBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
