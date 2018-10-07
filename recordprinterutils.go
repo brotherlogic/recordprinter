@@ -2,12 +2,14 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"golang.org/x/net/context"
 )
 
 func (s *Server) moveLoop(ctx context.Context) {
 	s.count++
+	s.lastCount = time.Now()
 	moves, err := s.bridge.getMoves(ctx)
 
 	if err != nil {
