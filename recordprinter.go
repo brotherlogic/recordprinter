@@ -98,11 +98,23 @@ func getLocation(ctx context.Context, rec *pbrc.Record) ([]string, error) {
 			if r.GetInstanceId() == rec.GetRelease().InstanceId {
 				str = append(str, fmt.Sprintf("  Slot %v\n", r.GetSlot()))
 				if i > 0 {
-					str = append(str, fmt.Sprintf("  %v. %v\n", i-1, getReleaseString(ctx, location.GetFoundLocation().GetReleasesLocation()[i-1].InstanceId)))
+					rString, err := getReleaseString(ctx, location.GetFoundLocation().GetReleasesLocation()[i-1].InstanceId)
+					if err != nil {
+						return []string{}, err
+					}
+					str = append(str, fmt.Sprintf("  %v. %v\n", i-1, rString))
 				}
-				str = append(str, fmt.Sprintf("  %v. %v\n", i, getReleaseString(ctx, location.GetFoundLocation().GetReleasesLocation()[i].InstanceId)))
+				rString, err := getReleaseString(ctx, location.GetFoundLocation().GetReleasesLocation()[i].InstanceId)
+				if err != nil {
+					return []string{}, err
+				}
+				str = append(str, fmt.Sprintf("  %v. %v\n", i, rString))
 				if i < len(location.GetFoundLocation().GetReleasesLocation())-1 {
-					str = append(str, fmt.Sprintf("  %v. %v\n", i+1, getReleaseString(ctx, location.GetFoundLocation().GetReleasesLocation()[i+1].InstanceId)))
+					rString, err := getReleaseString(ctx, location.GetFoundLocation().GetReleasesLocation()[i+1].InstanceId)
+					if err != nil {
+						return []string{}, err
+					}
+					str = append(str, fmt.Sprintf("  %v. %v\n", i+1, rString))
 				}
 			}
 		}
@@ -110,24 +122,24 @@ func getLocation(ctx context.Context, rec *pbrc.Record) ([]string, error) {
 	return str, nil
 }
 
-func getReleaseString(ctx context.Context, instanceID int32) string {
+func getReleaseString(ctx context.Context, instanceID int32) (string, error) {
 	host, port, err := utils.Resolve("recordcollection")
 	if err != nil {
-		log.Fatalf("Unable to reach collection: %v", err)
+		return "", err
 	}
 	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
 	defer conn.Close()
 
 	if err != nil {
-		log.Fatalf("Unable to dial: %v", err)
+		return "", err
 	}
 
 	client := pbrc.NewRecordCollectionServiceClient(conn)
 	rel, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Force: true, Filter: &pbrc.Record{Release: &pbgd.Release{InstanceId: instanceID}}})
 	if err != nil {
-		log.Fatalf("unable to get record: %v", err)
+		return "", err
 	}
-	return rel.GetRecords()[0].GetRelease().Title + " [" + strconv.Itoa(int(instanceID)) + "]"
+	return rel.GetRecords()[0].GetRelease().Title + " [" + strconv.Itoa(int(instanceID)) + "]", nil
 }
 
 func (p *prodBridge) resolve(ctx context.Context, move *pbrm.RecordMove) ([]string, error) {
