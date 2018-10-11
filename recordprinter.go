@@ -31,28 +31,28 @@ type Bridge interface {
 
 type prodBridge struct{}
 
-func getRecord(ctx context.Context, instanceID int32) *pbrc.Record {
+func getRecord(ctx context.Context, instanceID int32) (*pbrc.Record, error) {
 	host, port, err := utils.Resolve("recordcollection")
 	if err != nil {
-		log.Fatalf("Unable to reach recordcollection: %v", err)
+		return &pbrc.Record{}, err
 	}
 	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
 	defer conn.Close()
 
 	if err != nil {
-		log.Fatalf("Unable to dial: %v", err)
+		return &pbrc.Record{}, err
 	}
 
 	client := pbrc.NewRecordCollectionServiceClient(conn)
 	r, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Filter: &pbrc.Record{Release: &pbgd.Release{InstanceId: instanceID}}})
 	if err != nil {
-		log.Fatalf("Unable to get records: %v", err)
+		return &pbrc.Record{}, err
 	}
 
 	if len(r.GetRecords()) == 0 {
 		log.Fatalf("Unable to get record: %v", instanceID)
 	}
-	return r.GetRecords()[0]
+	return r.GetRecords()[0], nil
 }
 
 func getFolder(ctx context.Context, folderID int32) (string, error) {
@@ -98,11 +98,11 @@ func getLocation(ctx context.Context, rec *pbrc.Record) ([]string, error) {
 			if r.GetInstanceId() == rec.GetRelease().InstanceId {
 				str = append(str, fmt.Sprintf("  Slot %v\n", r.GetSlot()))
 				if i > 0 {
-					str = append(str, fmt.Sprintf("  %v. %v\n", i-1, getReleaseString(location.GetFoundLocation().GetReleasesLocation()[i-1].InstanceId)))
+					str = append(str, fmt.Sprintf("  %v. %v\n", i-1, getReleaseString(ctx, location.GetFoundLocation().GetReleasesLocation()[i-1].InstanceId)))
 				}
-				str = append(str, fmt.Sprintf("  %v. %v\n", i, getReleaseString(location.GetFoundLocation().GetReleasesLocation()[i].InstanceId)))
+				str = append(str, fmt.Sprintf("  %v. %v\n", i, getReleaseString(ctx, location.GetFoundLocation().GetReleasesLocation()[i].InstanceId)))
 				if i < len(location.GetFoundLocation().GetReleasesLocation())-1 {
-					str = append(str, fmt.Sprintf("  %v. %v\n", i+1, getReleaseString(location.GetFoundLocation().GetReleasesLocation()[i+1].InstanceId)))
+					str = append(str, fmt.Sprintf("  %v. %v\n", i+1, getReleaseString(ctx, location.GetFoundLocation().GetReleasesLocation()[i+1].InstanceId)))
 				}
 			}
 		}
@@ -110,7 +110,7 @@ func getLocation(ctx context.Context, rec *pbrc.Record) ([]string, error) {
 	return str, nil
 }
 
-func getReleaseString(instanceID int32) string {
+func getReleaseString(ctx context.Context, instanceID int32) string {
 	host, port, err := utils.Resolve("recordcollection")
 	if err != nil {
 		log.Fatalf("Unable to reach collection: %v", err)
@@ -123,8 +123,6 @@ func getReleaseString(instanceID int32) string {
 	}
 
 	client := pbrc.NewRecordCollectionServiceClient(conn)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
-	defer cancel()
 	rel, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Force: true, Filter: &pbrc.Record{Release: &pbgd.Release{InstanceId: instanceID}}})
 	if err != nil {
 		log.Fatalf("unable to get record: %v", err)
@@ -133,7 +131,12 @@ func getReleaseString(instanceID int32) string {
 }
 
 func (p *prodBridge) resolve(ctx context.Context, move *pbrm.RecordMove) ([]string, error) {
-	r := getRecord(ctx, move.InstanceId)
+	r, err := getRecord(ctx, move.InstanceId)
+
+	if err != nil {
+		return []string{}, err
+	}
+
 	f1, err := getFolder(ctx, move.FromFolder)
 	if err != nil {
 		return []string{}, err
