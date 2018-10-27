@@ -76,7 +76,7 @@ func getFolder(ctx context.Context, folderID int32) (string, error) {
 	return r.LocationName, nil
 }
 
-func getLocation(ctx context.Context, rec *pbrc.Record) ([]string, error) {
+func getLocation(ctx context.Context, rec *pbrc.Record, folder string) ([]string, error) {
 	host, port, err := utils.Resolve("recordsorganiser")
 	if err != nil {
 		return []string{}, err
@@ -91,8 +91,8 @@ func getLocation(ctx context.Context, rec *pbrc.Record) ([]string, error) {
 	client := pbro.NewOrganiserServiceClient(conn)
 	location, err := client.Locate(ctx, &pbro.LocateRequest{InstanceId: rec.GetRelease().InstanceId})
 	str := []string{}
-	if err != nil {
-		str = append(str, fmt.Sprintf("Unable to locate instance (%v) because %v\n", rec.GetRelease().InstanceId, err))
+	if err != nil || location.GetFoundLocation().Name != folder {
+		return []string{}, fmt.Errorf("Unable to locate instance (%v) because %v\n", rec.GetRelease().InstanceId, err)
 	} else {
 		for i, r := range location.GetFoundLocation().GetReleasesLocation() {
 			if r.GetInstanceId() == rec.GetRelease().InstanceId {
@@ -159,7 +159,7 @@ func (p *prodBridge) resolve(ctx context.Context, move *pbrm.RecordMove) ([]stri
 		return []string{}, err
 	}
 
-	loc, err := getLocation(ctx, r)
+	loc, err := getLocation(ctx, r, f2)
 	if err != nil {
 		return []string{}, err
 	}
