@@ -19,6 +19,13 @@ func (s *Server) moveLoop(ctx context.Context) {
 
 	for _, move := range moves {
 		s.Log(fmt.Sprintf("MOVE: %v", move.InstanceId))
+
+		//Raise an alarm if the move has no record
+		if move.Record == nil {
+			s.RaiseIssue(ctx, "Record is missing from move", fmt.Sprintf("Move regarding %v is missing the record information", move.InstanceId), false)
+			return
+		}
+
 		lines, err := s.bridge.resolve(ctx, move)
 		if err != nil {
 			s.Log(fmt.Sprintf("Error getting move: %v", err))
