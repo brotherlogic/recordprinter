@@ -17,6 +17,7 @@ type testBridge struct {
 	failClear   bool
 	failResolve bool
 	poorRecord  bool
+	poorContext bool
 }
 
 func (t *testBridge) resolve(ctx context.Context, move *pbrm.RecordMove) ([]string, error) {
@@ -33,7 +34,12 @@ func (t *testBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
 	if t.poorRecord {
 		return []*pbrm.RecordMove{&pbrm.RecordMove{InstanceId: int32(1234)}}, nil
 	}
-	return []*pbrm.RecordMove{&pbrm.RecordMove{InstanceId: int32(1234), Record: &pbrc.Record{Release: &pbgd.Release{InstanceId: 1234}}}}, nil
+
+	if t.poorContext {
+		return []*pbrm.RecordMove{&pbrm.RecordMove{InstanceId: int32(1234), Record: &pbrc.Record{Release: &pbgd.Release{InstanceId: 1234}}, BeforeContext: &pbrm.Context{}, AfterContext: &pbrm.Context{}}}, nil
+	}
+
+	return []*pbrm.RecordMove{&pbrm.RecordMove{InstanceId: int32(1234), Record: &pbrc.Record{Release: &pbgd.Release{InstanceId: 1234}}, BeforeContext: &pbrm.Context{Before: &pbrc.Record{}}, AfterContext: &pbrm.Context{Before: &pbrc.Record{}}}}, nil
 }
 func (t *testBridge) clearMove(ctx context.Context, move *pbrm.RecordMove) error {
 	if t.failClear {
@@ -64,6 +70,12 @@ func TestMove(t *testing.T) {
 func TestMovePoor(t *testing.T) {
 	s := InitTestServer()
 	s.bridge = &testBridge{poorRecord: true}
+	s.moveLoop(context.Background())
+}
+
+func TestMovePoorContext(t *testing.T) {
+	s := InitTestServer()
+	s.bridge = &testBridge{poorContext: true}
 	s.moveLoop(context.Background())
 }
 
