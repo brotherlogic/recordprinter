@@ -92,30 +92,29 @@ func getLocation(ctx context.Context, rec *pbrc.Record, folder string) ([]string
 	location, err := client.Locate(ctx, &pbro.LocateRequest{InstanceId: rec.GetRelease().InstanceId})
 	str := []string{}
 	if err != nil || location.GetFoundLocation().Name != folder {
-		return []string{}, fmt.Errorf("Unable to locate instance (%v) because %v\n", rec.GetRelease().InstanceId, err)
-	} else {
-		for i, r := range location.GetFoundLocation().GetReleasesLocation() {
-			if r.GetInstanceId() == rec.GetRelease().InstanceId {
-				str = append(str, fmt.Sprintf("  Slot %v\n", r.GetSlot()))
-				if i > 0 {
-					rString, err := getReleaseString(ctx, location.GetFoundLocation().GetReleasesLocation()[i-1].InstanceId)
-					if err != nil {
-						return []string{}, err
-					}
-					str = append(str, fmt.Sprintf("  %v. %v\n", i-1, rString))
-				}
-				rString, err := getReleaseString(ctx, location.GetFoundLocation().GetReleasesLocation()[i].InstanceId)
+		return []string{}, fmt.Errorf("Unable to locate instance (%v) because %v", rec.GetRelease().InstanceId, err)
+	}
+	for i, r := range location.GetFoundLocation().GetReleasesLocation() {
+		if r.GetInstanceId() == rec.GetRelease().InstanceId {
+			str = append(str, fmt.Sprintf("  Slot %v\n", r.GetSlot()))
+			if i > 0 {
+				rString, err := getReleaseString(ctx, location.GetFoundLocation().GetReleasesLocation()[i-1].InstanceId)
 				if err != nil {
 					return []string{}, err
 				}
-				str = append(str, fmt.Sprintf("  %v. %v\n", i, rString))
-				if i < len(location.GetFoundLocation().GetReleasesLocation())-1 {
-					rString, err := getReleaseString(ctx, location.GetFoundLocation().GetReleasesLocation()[i+1].InstanceId)
-					if err != nil {
-						return []string{}, err
-					}
-					str = append(str, fmt.Sprintf("  %v. %v\n", i+1, rString))
+				str = append(str, fmt.Sprintf("  %v. %v\n", i-1, rString))
+			}
+			rString, err := getReleaseString(ctx, location.GetFoundLocation().GetReleasesLocation()[i].InstanceId)
+			if err != nil {
+				return []string{}, err
+			}
+			str = append(str, fmt.Sprintf("  %v. %v\n", i, rString))
+			if i < len(location.GetFoundLocation().GetReleasesLocation())-1 {
+				rString, err := getReleaseString(ctx, location.GetFoundLocation().GetReleasesLocation()[i+1].InstanceId)
+				if err != nil {
+					return []string{}, err
 				}
+				str = append(str, fmt.Sprintf("  %v. %v\n", i+1, rString))
 			}
 		}
 	}
@@ -143,12 +142,6 @@ func getReleaseString(ctx context.Context, instanceID int32) (string, error) {
 }
 
 func (p *prodBridge) resolve(ctx context.Context, move *pbrm.RecordMove) ([]string, error) {
-	r, err := getRecord(ctx, move.InstanceId)
-
-	if err != nil {
-		return []string{}, err
-	}
-
 	f1, err := getFolder(ctx, move.FromFolder)
 	if err != nil {
 		return []string{}, err
@@ -159,12 +152,12 @@ func (p *prodBridge) resolve(ctx context.Context, move *pbrm.RecordMove) ([]stri
 		return []string{}, err
 	}
 
-	loc, err := getLocation(ctx, r, f2)
+	loc, err := getLocation(ctx, move.Record, f2)
 	if err != nil {
 		return []string{}, err
 	}
 
-	strret := []string{fmt.Sprintf("%v: %v -> %v\n", r.GetRelease().Title, f1, f2)}
+	strret := []string{fmt.Sprintf("%v: %v -> %v\n", move.Record.GetRelease().Title, f1, f2)}
 	for _, v := range loc {
 		strret = append(strret, v)
 	}
