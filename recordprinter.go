@@ -283,6 +283,6 @@ func main() {
 
 	server.RegisterRepeatingTask(server.moveLoop, "move_loop", time.Hour)
 
-	server.Log("Starting!")
+	server.Log(fmt.Sprintf("Starting %v", server.GoServer.RunningFile))
 	fmt.Printf("%v", server.Serve())
 }
