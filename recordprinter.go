@@ -272,10 +272,9 @@ func main() {
 	server := Init()
 	server.PrepServer()
 	server.Register = server
-	server.RegisterServer("recordprinter", false)
 
+	server.RegisterServer("recordprinter", false)
 	server.RegisterRepeatingTask(server.moveLoop, "move_loop", time.Hour)
 
-	server.Log(fmt.Sprintf("Starting %v", server.GoServer.RunningFile))
 	fmt.Printf("%v", server.Serve())
 }
