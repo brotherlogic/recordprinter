@@ -28,6 +28,7 @@ func (s *Server) moveLoop(ctx context.Context) {
 
 		//Raise an alarm if the move context is incomplete
 		if (move.GetBeforeContext() == nil || move.GetAfterContext() == nil) || (move.GetBeforeContext().Before == nil && move.GetBeforeContext().After == nil) || (move.GetAfterContext().Before == nil && move.GetAfterContext().After == nil) {
+			s.Log(fmt.Sprintf("Move : %v", move))
 			s.RaiseIssue(ctx, "Context is missing from move", fmt.Sprintf("Move regarding %v is missing the full context", move.InstanceId), false)
 			return
 		}
