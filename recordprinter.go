@@ -92,7 +92,7 @@ func getLocation(ctx context.Context, rec *pbrc.Record, folder string) ([]string
 	location, err := client.Locate(ctx, &pbro.LocateRequest{InstanceId: rec.GetRelease().InstanceId})
 	str := []string{}
 	if err != nil || location.GetFoundLocation().Name != folder {
-		return []string{}, fmt.Errorf("Unable to locate instance (%v) because %v", rec.GetRelease().InstanceId, err)
+		return []string{}, fmt.Errorf("Unable to locate instance (%v) because %v and %v given %v", rec.GetRelease().InstanceId, err, location.GetFoundLocation().Name, folder)
 	}
 	for i, r := range location.GetFoundLocation().GetReleasesLocation() {
 		if r.GetInstanceId() == rec.GetRelease().InstanceId {
