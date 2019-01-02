@@ -41,12 +41,7 @@ func (s *Server) moveLoop(ctx context.Context) {
 
 		s.Log(fmt.Sprintf("PRINTING: %v", lines))
 
-		if err != nil {
-			s.Log(fmt.Sprintf("Error getting move: %v", err))
-			return
-		}
 		err = s.bridge.print(ctx, lines)
-
 		if err != nil {
 			s.Log(fmt.Sprintf("Error printing move: %v", err))
 			return
