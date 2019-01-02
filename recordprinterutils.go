@@ -27,14 +27,20 @@ func (s *Server) moveLoop(ctx context.Context) {
 		}
 
 		//Raise an alarm if the move context is incomplete
-		s.Log(fmt.Sprintf("Testing %v and %v", move.GetBeforeContext(), move.GetAfterContext()))
 		if (move.GetBeforeContext() == nil || move.GetAfterContext() == nil) || (move.GetBeforeContext().Before == nil && move.GetBeforeContext().After == nil) || (move.GetAfterContext().Before == nil && move.GetAfterContext().After == nil) {
-			s.Log(fmt.Sprintf("Move : %v", move))
 			s.RaiseIssue(ctx, "Context is missing from move", fmt.Sprintf("Move regarding %v is missing the full context %v -> %v", move.InstanceId, move.BeforeContext, move.AfterContext), false)
 			return
 		}
 
-		lines, err := s.bridge.resolve(ctx, move)
+		lines := []string{fmt.Sprintf("%v: %v -> %v\n", move.Record.GetRelease().Title, move.GetBeforeContext().Location, move.GetAfterContext().Location)}
+
+		lines = append(lines, fmt.Sprintf(" Slot %v\n", move.GetAfterContext().Slot))
+		lines = append(lines, fmt.Sprintf(" %v\n", move.GetAfterContext().GetBefore().GetRelease().Title))
+		lines = append(lines, fmt.Sprintf(" %v\n", move.Record.GetRelease().Title))
+		lines = append(lines, fmt.Sprintf(" %v\n", move.GetAfterContext().GetAfter().GetRelease().Title))
+
+		s.Log(fmt.Sprintf("PRINTING: %v", lines))
+
 		if err != nil {
 			s.Log(fmt.Sprintf("Error getting move: %v", err))
 			return
