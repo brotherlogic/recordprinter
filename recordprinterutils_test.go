@@ -39,7 +39,7 @@ func (t *testBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
 		return []*pbrm.RecordMove{&pbrm.RecordMove{InstanceId: int32(1234), Record: &pbrc.Record{Release: &pbgd.Release{InstanceId: 1234}}, BeforeContext: &pbrm.Context{}, AfterContext: &pbrm.Context{}}}, nil
 	}
 
-	return []*pbrm.RecordMove{&pbrm.RecordMove{InstanceId: int32(1234), Record: &pbrc.Record{Release: &pbgd.Release{InstanceId: 1234}}, BeforeContext: &pbrm.Context{Before: &pbrc.Record{}}, AfterContext: &pbrm.Context{Before: &pbrc.Record{}}}}, nil
+	return []*pbrm.RecordMove{&pbrm.RecordMove{InstanceId: int32(1234), Record: &pbrc.Record{Release: &pbgd.Release{InstanceId: 1234, Title: "madeup"}}, BeforeContext: &pbrm.Context{Before: &pbrc.Record{Release: &pbgd.Release{Title: "donkey"}}}, AfterContext: &pbrm.Context{Before: &pbrc.Record{Release: &pbgd.Release{Title: "magic"}}, After: &pbrc.Record{Release: &pbgd.Release{Title: "magic"}}}}}, nil
 }
 func (t *testBridge) clearMove(ctx context.Context, move *pbrm.RecordMove) error {
 	if t.failClear {
