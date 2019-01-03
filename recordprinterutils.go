@@ -33,11 +33,14 @@ func (s *Server) moveLoop(ctx context.Context) {
 		}
 
 		lines := []string{fmt.Sprintf("%v: %v -> %v\n", move.Record.GetRelease().Title, move.GetBeforeContext().Location, move.GetAfterContext().Location)}
-
 		lines = append(lines, fmt.Sprintf(" Slot %v\n", move.GetAfterContext().Slot))
-		lines = append(lines, fmt.Sprintf(" %v\n", move.GetAfterContext().GetBefore().GetRelease().Title))
+		if move.GetAfterContext().GetBefore() != nil {
+			lines = append(lines, fmt.Sprintf(" %v\n", move.GetAfterContext().GetBefore().GetRelease().Title))
+		}
 		lines = append(lines, fmt.Sprintf(" %v\n", move.Record.GetRelease().Title))
-		lines = append(lines, fmt.Sprintf(" %v\n", move.GetAfterContext().GetAfter().GetRelease().Title))
+		if move.GetAfterContext().GetAfter() != nil {
+			lines = append(lines, fmt.Sprintf(" %v\n", move.GetAfterContext().GetAfter().GetRelease().Title))
+		}
 
 		s.Log(fmt.Sprintf("PRINTING: %v", lines))
 
