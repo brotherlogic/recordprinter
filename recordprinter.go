@@ -274,7 +274,7 @@ func main() {
 	server.Register = server
 
 	server.RegisterServer("recordprinter", false)
-	server.RegisterRepeatingTask(server.moveLoop, "move_loop", time.Hour)
+	server.RegisterRepeatingTask(server.moveLoop, "move_loop", time.Minute*5)
 
 	fmt.Printf("%v", server.Serve())
 }
