@@ -214,7 +214,7 @@ func (p *prodBridge) print(ctx context.Context, lines []string) error {
 	}
 
 	client := pbp.NewPrintServiceClient(conn)
-	_, err = client.Print(ctx, &pbp.PrintRequest{Lines: lines})
+	_, err = client.Print(ctx, &pbp.PrintRequest{Lines: lines, Origin: "recordprinter"})
 	return err
 }
 
