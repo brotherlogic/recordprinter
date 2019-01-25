@@ -35,22 +35,27 @@ func (s *Server) moveLoop(ctx context.Context) {
 				return
 			}
 
-			lines := []string{fmt.Sprintf("%v: %v -> %v\n", move.Record.GetRelease().Title, move.GetBeforeContext().Location, move.GetAfterContext().Location)}
-			lines = append(lines, fmt.Sprintf(" (Slot %v)\n", move.GetAfterContext().Slot))
-			if move.GetAfterContext().GetBefore() != nil {
-				lines = append(lines, fmt.Sprintf(" %v\n", move.GetAfterContext().GetBefore().GetRelease().Title))
-			}
-			lines = append(lines, fmt.Sprintf(" %v\n", move.Record.GetRelease().Title))
-			if move.GetAfterContext().GetAfter() != nil {
-				lines = append(lines, fmt.Sprintf(" %v\n", move.GetAfterContext().GetAfter().GetRelease().Title))
-			}
+			//We don't need to print purgatory or google_play moves
+			if (move.GetBeforeContext().Location != "Purgatory" || move.GetAfterContext().Location != "Purgatory") ||
+				(move.GetBeforeContext().Location != "Google Play" || move.GetAfterContext().Location != "Google Play") {
 
-			s.Log(fmt.Sprintf("PRINTING: %v", lines))
+				lines := []string{fmt.Sprintf("%v: %v -> %v\n", move.Record.GetRelease().Title, move.GetBeforeContext().Location, move.GetAfterContext().Location)}
+				lines = append(lines, fmt.Sprintf(" (Slot %v)\n", move.GetAfterContext().Slot))
+				if move.GetAfterContext().GetBefore() != nil {
+					lines = append(lines, fmt.Sprintf(" %v\n", move.GetAfterContext().GetBefore().GetRelease().Title))
+				}
+				lines = append(lines, fmt.Sprintf(" %v\n", move.Record.GetRelease().Title))
+				if move.GetAfterContext().GetAfter() != nil {
+					lines = append(lines, fmt.Sprintf(" %v\n", move.GetAfterContext().GetAfter().GetRelease().Title))
+				}
 
-			err = s.bridge.print(ctx, lines)
-			if err != nil {
-				s.Log(fmt.Sprintf("Error printing move: %v", err))
-				return
+				s.Log(fmt.Sprintf("PRINTING: %v", lines))
+
+				err = s.bridge.print(ctx, lines)
+				if err != nil {
+					s.Log(fmt.Sprintf("Error printing move: %v", err))
+					return
+				}
 			}
 
 			err = s.bridge.clearMove(ctx, move)
