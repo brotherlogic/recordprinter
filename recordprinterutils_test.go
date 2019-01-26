@@ -18,6 +18,7 @@ type testBridge struct {
 	failResolve bool
 	poorRecord  bool
 	poorContext bool
+	multiple    bool
 }
 
 func (t *testBridge) resolve(ctx context.Context, move *pbrm.RecordMove) ([]string, error) {
@@ -37,6 +38,79 @@ func (t *testBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
 
 	if t.poorContext {
 		return []*pbrm.RecordMove{&pbrm.RecordMove{InstanceId: int32(1234), Record: &pbrc.Record{Release: &pbgd.Release{InstanceId: 1234}}, BeforeContext: &pbrm.Context{Location: "Before"}, AfterContext: &pbrm.Context{Location: "After"}}}, nil
+	}
+
+	if t.multiple {
+		return []*pbrm.RecordMove{
+			&pbrm.RecordMove{
+				InstanceId: int32(1234),
+				Record: &pbrc.Record{
+					Release: &pbgd.Release{
+						InstanceId: 1234,
+						Title:      "madeup",
+					},
+				},
+				BeforeContext: &pbrm.Context{
+					Location: "Before",
+					Before: &pbrc.Record{
+						Release: &pbgd.Release{
+							Title: "donkey",
+						},
+					},
+					After: &pbrc.Record{
+						Release: &pbgd.Release{
+							Title: "donkey",
+						},
+					},
+				},
+				AfterContext: &pbrm.Context{
+					Before: &pbrc.Record{
+						Release: &pbgd.Release{
+							Title: "magic",
+						},
+					},
+					After: &pbrc.Record{
+						Release: &pbgd.Release{
+							Title: "magic",
+						},
+					},
+				},
+			},
+			&pbrm.RecordMove{
+				InstanceId: int32(1234),
+				Record: &pbrc.Record{
+					Release: &pbgd.Release{
+						InstanceId: 1234,
+						Title:      "madeup",
+					},
+				},
+				BeforeContext: &pbrm.Context{
+					Location: "Before",
+					Before: &pbrc.Record{
+						Release: &pbgd.Release{
+							Title: "donkey",
+						},
+					},
+					After: &pbrc.Record{
+						Release: &pbgd.Release{
+							Title: "donkey",
+						},
+					},
+				},
+				AfterContext: &pbrm.Context{
+					Before: &pbrc.Record{
+						Release: &pbgd.Release{
+							Title: "magic",
+						},
+					},
+					After: &pbrc.Record{
+						Release: &pbgd.Release{
+							Title: "magic",
+						},
+					},
+				},
+			},
+		}, nil
 	}
 
 	return []*pbrm.RecordMove{&pbrm.RecordMove{InstanceId: int32(1234), Record: &pbrc.Record{Release: &pbgd.Release{InstanceId: 1234, Title: "madeup"}}, BeforeContext: &pbrm.Context{Location: "Before", Before: &pbrc.Record{Release: &pbgd.Release{Title: "donkey"}}, After: &pbrc.Record{Release: &pbgd.Release{Title: "donkey"}}}, AfterContext: &pbrm.Context{Before: &pbrc.Record{Release: &pbgd.Release{Title: "magic"}}, After: &pbrc.Record{Release: &pbgd.Release{Title: "magic"}}}}}, nil
@@ -64,6 +138,12 @@ func InitTestServer() *Server {
 func TestMove(t *testing.T) {
 	s := InitTestServer()
 	s.bridge = &testBridge{}
+	s.moveLoop(context.Background())
+}
+
+func TestMultiMove(t *testing.T) {
+	s := InitTestServer()
+	s.bridge = &testBridge{multiple: true}
 	s.moveLoop(context.Background())
 }
 
