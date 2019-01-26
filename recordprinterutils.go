@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sort"
 	"time"
 
 	"golang.org/x/net/context"
@@ -16,6 +17,11 @@ func (s *Server) moveLoop(ctx context.Context) {
 		s.Log(fmt.Sprintf("Error getting moves: %v", err))
 		return
 	}
+
+	//Sort moves by date
+	sort.SliceStable(moves, func(i, j int) bool {
+		return moves[i].MoveDate < moves[j].MoveDate
+	})
 
 	for _, move := range moves {
 		if move.GetBeforeContext() != nil && move.GetAfterContext() != nil && move.GetBeforeContext().Location != move.GetAfterContext().Location {
