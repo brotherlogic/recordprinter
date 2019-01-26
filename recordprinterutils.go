@@ -34,8 +34,8 @@ func (s *Server) moveLoop(ctx context.Context) {
 			}
 
 			//We don't need to print purgatory or google_play moves
-			if (move.GetBeforeContext().Location != "Purgatory" || move.GetAfterContext().Location != "Purgatory") ||
-				(move.GetBeforeContext().Location != "Google Play" || move.GetAfterContext().Location != "Google Play") {
+			if (move.GetBeforeContext().Location != "Purgatory" && move.GetAfterContext().Location != "Purgatory") &&
+				(move.GetBeforeContext().Location != "Google Play" && move.GetAfterContext().Location != "Google Play") {
 
 				//Raise an alarm if the move context is incomplete
 				if (move.GetBeforeContext() == nil || move.GetAfterContext() == nil) ||
