@@ -33,17 +33,17 @@ func (s *Server) moveLoop(ctx context.Context) {
 				return
 			}
 
-			//Raise an alarm if the move context is incomplete
-			if (move.GetBeforeContext() == nil || move.GetAfterContext() == nil) ||
-				(move.GetBeforeContext().Before == nil || move.GetBeforeContext().After == nil) ||
-				(move.GetAfterContext().Before == nil || move.GetAfterContext().After == nil) {
-				s.RaiseIssue(ctx, "Context is missing from move", fmt.Sprintf("Move regarding %v is missing the full context %v -> %v", move.InstanceId, move.BeforeContext, move.AfterContext), false)
-				return
-			}
-
 			//We don't need to print purgatory or google_play moves
 			if (move.GetBeforeContext().Location != "Purgatory" || move.GetAfterContext().Location != "Purgatory") ||
 				(move.GetBeforeContext().Location != "Google Play" || move.GetAfterContext().Location != "Google Play") {
+
+				//Raise an alarm if the move context is incomplete
+				if (move.GetBeforeContext() == nil || move.GetAfterContext() == nil) ||
+					(move.GetBeforeContext().Before == nil || move.GetBeforeContext().After == nil) ||
+					(move.GetAfterContext().Before == nil || move.GetAfterContext().After == nil) {
+					s.RaiseIssue(ctx, "Context is missing from move", fmt.Sprintf("Move regarding %v is missing the full context %v -> %v", move.InstanceId, move.BeforeContext, move.AfterContext), false)
+					return
+				}
 
 				lines := []string{fmt.Sprintf("%v: %v -> %v\n", move.Record.GetRelease().Title, move.GetBeforeContext().Location, move.GetAfterContext().Location)}
 				lines = append(lines, fmt.Sprintf(" (Slot %v)\n", move.GetAfterContext().Slot))
