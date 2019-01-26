@@ -273,7 +273,10 @@ func main() {
 	server.PrepServer()
 	server.Register = server
 
-	server.RegisterServer("recordprinter", false)
+	err := server.RegisterServer("recordprinter", false)
+	if err != nil {
+		log.Fatalf("Registration Error: %v", err)
+	}
 	server.RegisterRepeatingTask(server.moveLoop, "move_loop", time.Minute*5)
 
 	fmt.Printf("%v", server.Serve())
