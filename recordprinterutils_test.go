@@ -184,3 +184,10 @@ func TestClearFail(t *testing.T) {
 	s.bridge = &testBridge{failClear: true}
 	s.moveLoop(context.Background())
 }
+
+func TestLocationMove(t *testing.T) {
+	s := InitTestServer()
+
+	s.move(context.Background(), &pbrm.RecordMove{BeforeContext: &pbrm.Context{Location: "same"}, AfterContext: &pbrm.Context{Location: "same"}})
+
+}
