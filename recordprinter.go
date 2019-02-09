@@ -275,6 +275,7 @@ func main() {
 	server := Init()
 	server.PrepServer()
 	server.Register = server
+	server.RPCTracing = true
 
 	err := server.RegisterServer("recordprinter", false)
 	if err != nil {
