@@ -14,6 +14,7 @@ func (s *Server) moveLoop(ctx context.Context) {
 	moves, err := s.bridge.getMoves(ctx)
 
 	if err != nil {
+		s.lastIssue = fmt.Sprintf("%v", err)
 		s.Log(fmt.Sprintf("Error getting moves: %v", err))
 		return
 	}
@@ -29,6 +30,7 @@ func (s *Server) moveLoop(ctx context.Context) {
 
 			//Raise an alarm if the move has no record
 			if move.Record == nil {
+				s.lastIssue = "Record is missing from the move"
 				s.RaiseIssue(ctx, "Record is missing from move", fmt.Sprintf("Move regarding %v is missing the record information", move.InstanceId), false)
 				return
 			}
@@ -41,6 +43,7 @@ func (s *Server) moveLoop(ctx context.Context) {
 				if (move.GetBeforeContext() == nil || move.GetAfterContext() == nil) ||
 					(move.GetBeforeContext().Before == nil && move.GetBeforeContext().After == nil) ||
 					(move.GetAfterContext().Before == nil || move.GetAfterContext().After == nil) {
+					s.lastIssue = "No Context"
 					s.RaiseIssue(ctx, "Context is missing from move", fmt.Sprintf("Move regarding %v is missing the full context %v -> %v", move.InstanceId, move.BeforeContext, move.AfterContext), false)
 					return
 				}
@@ -66,8 +69,11 @@ func (s *Server) moveLoop(ctx context.Context) {
 
 			err = s.bridge.clearMove(ctx, move)
 			if err != nil {
+				s.lastIssue = fmt.Sprintf("%v", err)
 				s.Log(fmt.Sprintf("Error clearing move: %v", err))
 			}
 		}
 	}
+
+	s.lastIssue = "No issues"
 }
