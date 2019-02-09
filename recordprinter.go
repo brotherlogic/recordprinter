@@ -224,6 +224,7 @@ type Server struct {
 	bridge    Bridge
 	count     int64
 	lastCount time.Time
+	lastIssue string
 }
 
 // Init builds the server
@@ -233,6 +234,7 @@ func Init() *Server {
 		&prodBridge{},
 		0,
 		time.Unix(0, 0),
+		"",
 	}
 	return s
 }
@@ -257,6 +259,7 @@ func (s *Server) GetState() []*pbg.State {
 	return []*pbg.State{
 		&pbg.State{Key: "curr_count", Value: s.count},
 		&pbg.State{Key: "last_count", Text: fmt.Sprintf("%v", s.lastCount)},
+		&pbg.State{Key: "error", Text: s.lastIssue},
 	}
 }
 
