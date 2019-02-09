@@ -25,6 +25,7 @@ func (s *Server) moveLoop(ctx context.Context) {
 	})
 
 	for _, move := range moves {
+		s.currMove = move.InstanceId
 		if move.GetBeforeContext() != nil && move.GetAfterContext() != nil && move.GetBeforeContext().Location != move.GetAfterContext().Location {
 			s.Log(fmt.Sprintf("MOVE: %v", move.InstanceId))
 

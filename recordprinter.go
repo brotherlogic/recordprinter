@@ -29,7 +29,9 @@ type Bridge interface {
 	resolve(ctx context.Context, move *pbrm.RecordMove) ([]string, error)
 }
 
-type prodBridge struct{}
+type prodBridge struct {
+	dial func(server string) (*grpc.ClientConn, error)
+}
 
 func getRecord(ctx context.Context, instanceID int32) (*pbrc.Record, error) {
 	host, port, err := utils.Resolve("recordcollection")
@@ -165,11 +167,7 @@ func (p *prodBridge) resolve(ctx context.Context, move *pbrm.RecordMove) ([]stri
 }
 
 func (p *prodBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
-	host, port, err := utils.Resolve("recordmover")
-	if err != nil {
-		return nil, err
-	}
-	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
+	conn, err := p.dial("recordmover")
 	defer conn.Close()
 
 	if err != nil {
@@ -185,11 +183,7 @@ func (p *prodBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
 }
 
 func (p *prodBridge) clearMove(ctx context.Context, move *pbrm.RecordMove) error {
-	host, port, err := utils.Resolve("recordmover")
-	if err != nil {
-		return err
-	}
-	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
+	conn, err := p.dial("recordmover")
 	defer conn.Close()
 
 	if err != nil {
@@ -202,11 +196,7 @@ func (p *prodBridge) clearMove(ctx context.Context, move *pbrm.RecordMove) error
 }
 
 func (p *prodBridge) print(ctx context.Context, lines []string) error {
-	host, port, err := utils.Resolve("printer")
-	if err != nil {
-		return err
-	}
-	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
+	conn, err := p.dial("printer")
 	defer conn.Close()
 
 	if err != nil {
@@ -225,6 +215,7 @@ type Server struct {
 	count     int64
 	lastCount time.Time
 	lastIssue string
+	currMove  int32
 }
 
 // Init builds the server
@@ -235,7 +226,9 @@ func Init() *Server {
 		0,
 		time.Unix(0, 0),
 		"",
+		0,
 	}
+	s.bridge = &prodBridge{s.DialMaster}
 	return s
 }
 
@@ -260,6 +253,7 @@ func (s *Server) GetState() []*pbg.State {
 		&pbg.State{Key: "curr_count", Value: s.count},
 		&pbg.State{Key: "last_count", Text: fmt.Sprintf("%v", s.lastCount)},
 		&pbg.State{Key: "error", Text: s.lastIssue},
+		&pbg.State{Key: "curr_move", Value: int64(s.currMove)},
 	}
 }
 
