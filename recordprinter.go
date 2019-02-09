@@ -168,11 +168,10 @@ func (p *prodBridge) resolve(ctx context.Context, move *pbrm.RecordMove) ([]stri
 
 func (p *prodBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
 	conn, err := p.dial("recordmover")
-	defer conn.Close()
-
 	if err != nil {
 		return nil, err
 	}
+	defer conn.Close()
 
 	client := pbrm.NewMoveServiceClient(conn)
 	resp, err := client.ListMoves(ctx, &pbrm.ListRequest{})
@@ -184,11 +183,10 @@ func (p *prodBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
 
 func (p *prodBridge) clearMove(ctx context.Context, move *pbrm.RecordMove) error {
 	conn, err := p.dial("recordmover")
-	defer conn.Close()
-
 	if err != nil {
 		return err
 	}
+	defer conn.Close()
 
 	client := pbrm.NewMoveServiceClient(conn)
 	_, err = client.ClearMove(ctx, &pbrm.ClearRequest{InstanceId: move.InstanceId})
@@ -197,11 +195,10 @@ func (p *prodBridge) clearMove(ctx context.Context, move *pbrm.RecordMove) error
 
 func (p *prodBridge) print(ctx context.Context, lines []string) error {
 	conn, err := p.dial("printer")
-	defer conn.Close()
-
 	if err != nil {
 		return err
 	}
+	defer conn.Close()
 
 	client := pbp.NewPrintServiceClient(conn)
 	_, err = client.Print(ctx, &pbp.PrintRequest{Lines: lines, Origin: "recordprinter"})
