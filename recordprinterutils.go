@@ -80,11 +80,12 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) {
 	}
 
 	if move.GetBeforeContext().Location == move.GetAfterContext().Location {
-		err := s.bridge.clearMove(ctx, move)
-		if err != nil {
-			s.lastIssue = fmt.Sprintf("%v", err)
-			s.Log(fmt.Sprintf("Error clearing move: %v", err))
-		}
+		/*		err := s.bridge.clearMove(ctx, move)
+				if err != nil {
+					s.lastIssue = fmt.Sprintf("%v", err)
+					s.Log(fmt.Sprintf("Error clearing move: %v", err))
+				}*/
+		s.Log(fmt.Sprintf("Clearing move: %v", move.InstanceId))
 	}
 
 }
