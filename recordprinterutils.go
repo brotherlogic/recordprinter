@@ -47,6 +47,8 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) {
 			return
 		}
 
+		s.Log(fmt.Sprintf("%v and %v", move.GetBeforeContext().Location, move.GetAfterContext().Location))
+
 		//We don't need to print purgatory or google_play moves
 		if (move.GetBeforeContext().Location != "Purgatory" && move.GetAfterContext().Location != "Purgatory") &&
 			(move.GetBeforeContext().Location != "Google Play" && move.GetAfterContext().Location != "Google Play") {
