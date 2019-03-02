@@ -69,7 +69,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) {
 				lines = append(lines, fmt.Sprintf(" %v\n", move.GetAfterContext().GetAfter().GetRelease().Title))
 			}
 
-			s.Log(fmt.Sprintf("PRINTING: %v", lines))
+			s.Log(fmt.Sprintf("DELIVER: %v", move.InstanceId))
 
 			err := s.bridge.print(ctx, lines)
 			if err != nil {
@@ -87,6 +87,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) {
 	}
 
 	if move.GetBeforeContext().Location == move.GetAfterContext().Location {
+		s.Log(fmt.Sprintf("CLearning move (matching location %v [%v])", move.InstanceId, move.GetBeforeContext().Location))
 		err := s.bridge.clearMove(ctx, move)
 		if err != nil {
 			s.lastIssue = fmt.Sprintf("%v", err)
