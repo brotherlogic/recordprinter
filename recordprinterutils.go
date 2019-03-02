@@ -90,7 +90,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) {
 		}
 	}
 
-	if move.GetBeforeContext().Location == move.GetAfterContext().Location {
+	if move.GetBeforeContext().Location == move.GetAfterContext().Location || move.GetBeforeContext().Location == "Purgatory" {
 		s.Log(fmt.Sprintf("CLearning move (matching location %v [%v])", move.InstanceId, move.GetBeforeContext().Location))
 		err := s.bridge.clearMove(ctx, move)
 		if err != nil {
