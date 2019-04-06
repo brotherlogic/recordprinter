@@ -10,7 +10,7 @@ import (
 	pbrm "github.com/brotherlogic/recordmover/proto"
 )
 
-func (s *Server) moveLoop(ctx context.Context) {
+func (s *Server) moveLoop(ctx context.Context) error {
 	s.count++
 	s.lastCount = time.Now()
 	moves, err := s.bridge.getMoves(ctx)
@@ -18,7 +18,7 @@ func (s *Server) moveLoop(ctx context.Context) {
 	if err != nil {
 		s.lastIssue = fmt.Sprintf("%v", err)
 		s.Log(fmt.Sprintf("Error getting moves: %v", err))
-		return
+		return err
 	}
 
 	//Sort moves by date
@@ -31,6 +31,7 @@ func (s *Server) moveLoop(ctx context.Context) {
 	}
 
 	s.lastIssue = "No issues"
+	return nil
 }
 
 func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) {
