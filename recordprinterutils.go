@@ -7,6 +7,7 @@ import (
 
 	"golang.org/x/net/context"
 
+	pbrc "github.com/brotherlogic/recordcollection/proto"
 	pbrm "github.com/brotherlogic/recordmover/proto"
 )
 
@@ -64,25 +65,28 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) {
 				return
 			}
 
-			lines := []string{fmt.Sprintf("%v: %v -> %v\n", move.Record.GetRelease().Title, move.GetBeforeContext().Location, move.GetAfterContext().Location)}
-			lines = append(lines, fmt.Sprintf(" (Slot %v)\n", move.GetAfterContext().Slot))
-			if move.GetAfterContext().GetBefore() != nil {
-				lines = append(lines, fmt.Sprintf(" %v\n", move.GetAfterContext().GetBefore().GetRelease().Title))
-			}
-			lines = append(lines, fmt.Sprintf(" %v\n", move.Record.GetRelease().Title))
-			if move.GetAfterContext().GetAfter() != nil {
-				lines = append(lines, fmt.Sprintf(" %v\n", move.GetAfterContext().GetAfter().GetRelease().Title))
+			// Only print if it's a FRESHMAN record
+			if move.GetAfterContext().After.GetMetadata().Category == pbrc.ReleaseMetadata_FRESHMAN {
+				lines := []string{fmt.Sprintf("%v: %v -> %v\n", move.Record.GetRelease().Title, move.GetBeforeContext().Location, move.GetAfterContext().Location)}
+				lines = append(lines, fmt.Sprintf(" (Slot %v)\n", move.GetAfterContext().Slot))
+				if move.GetAfterContext().GetBefore() != nil {
+					lines = append(lines, fmt.Sprintf(" %v\n", move.GetAfterContext().GetBefore().GetRelease().Title))
+				}
+				lines = append(lines, fmt.Sprintf(" %v\n", move.Record.GetRelease().Title))
+				if move.GetAfterContext().GetAfter() != nil {
+					lines = append(lines, fmt.Sprintf(" %v\n", move.GetAfterContext().GetAfter().GetRelease().Title))
+				}
+
+				s.Log(fmt.Sprintf("DELIVER: %v", move.InstanceId))
+
+				err := s.bridge.print(ctx, lines)
+				if err != nil {
+					s.Log(fmt.Sprintf("Error printing move: %v", err))
+					return
+				}
 			}
 
-			s.Log(fmt.Sprintf("DELIVER: %v", move.InstanceId))
-
-			err := s.bridge.print(ctx, lines)
-			if err != nil {
-				s.Log(fmt.Sprintf("Error printing move: %v", err))
-				return
-			}
-
-			err = s.bridge.clearMove(ctx, move)
+			err := s.bridge.clearMove(ctx, move)
 			if err != nil {
 				s.lastIssue = fmt.Sprintf("%v", err)
 				s.Log(fmt.Sprintf("Error clearing move: %v", err))

@@ -49,6 +49,7 @@ func (t *testBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
 						InstanceId: 1234,
 						Title:      "madeup",
 					},
+					Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_FRESHMAN},
 				},
 				BeforeContext: &pbrm.Context{
 					Location: "Before",
@@ -56,11 +57,13 @@ func (t *testBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
 						Release: &pbgd.Release{
 							Title: "donkey",
 						},
+						Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_FRESHMAN},
 					},
 					After: &pbrc.Record{
 						Release: &pbgd.Release{
 							Title: "donkey",
 						},
+						Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_FRESHMAN},
 					},
 				},
 				AfterContext: &pbrm.Context{
@@ -68,11 +71,13 @@ func (t *testBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
 						Release: &pbgd.Release{
 							Title: "magic",
 						},
+						Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_FRESHMAN},
 					},
 					After: &pbrc.Record{
 						Release: &pbgd.Release{
 							Title: "magic",
 						},
+						Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_FRESHMAN},
 					},
 				},
 			},
@@ -83,6 +88,7 @@ func (t *testBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
 						InstanceId: 1234,
 						Title:      "madeup",
 					},
+					Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_FRESHMAN},
 				},
 				BeforeContext: &pbrm.Context{
 					Location: "Before",
@@ -90,11 +96,13 @@ func (t *testBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
 						Release: &pbgd.Release{
 							Title: "donkey",
 						},
+						Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_FRESHMAN},
 					},
 					After: &pbrc.Record{
 						Release: &pbgd.Release{
 							Title: "donkey",
 						},
+						Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_FRESHMAN},
 					},
 				},
 				AfterContext: &pbrm.Context{
@@ -102,18 +110,44 @@ func (t *testBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
 						Release: &pbgd.Release{
 							Title: "magic",
 						},
+						Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_FRESHMAN},
 					},
 					After: &pbrc.Record{
 						Release: &pbgd.Release{
 							Title: "magic",
 						},
+						Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_FRESHMAN},
 					},
 				},
 			},
 		}, nil
 	}
 
-	return []*pbrm.RecordMove{&pbrm.RecordMove{InstanceId: int32(1234), Record: &pbrc.Record{Release: &pbgd.Release{InstanceId: 1234, Title: "madeup"}}, BeforeContext: &pbrm.Context{Location: "Before", Before: &pbrc.Record{Release: &pbgd.Release{Title: "donkey"}}, After: &pbrc.Record{Release: &pbgd.Release{Title: "donkey"}}}, AfterContext: &pbrm.Context{Before: &pbrc.Record{Release: &pbgd.Release{Title: "magic"}}, After: &pbrc.Record{Release: &pbgd.Release{Title: "magic"}}}}}, nil
+	return []*pbrm.RecordMove{
+		&pbrm.RecordMove{
+			InstanceId: int32(1234),
+			Record: &pbrc.Record{
+				Release:  &pbgd.Release{InstanceId: 1234, Title: "madeup"},
+				Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_FRESHMAN},
+			},
+			BeforeContext: &pbrm.Context{
+				Location: "Before",
+				Before: &pbrc.Record{
+					Release:  &pbgd.Release{Title: "donkey"},
+					Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_FRESHMAN},
+				},
+				After: &pbrc.Record{Release: &pbgd.Release{Title: "donkey"},
+					Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_FRESHMAN},
+				},
+			},
+			AfterContext: &pbrm.Context{
+				Before: &pbrc.Record{
+					Release:  &pbgd.Release{Title: "magic"},
+					Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_FRESHMAN},
+				},
+				After: &pbrc.Record{Release: &pbgd.Release{Title: "magic"},
+					Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_FRESHMAN},
+				}}}}, nil
 }
 func (t *testBridge) clearMove(ctx context.Context, move *pbrm.RecordMove) error {
 	if t.failClear {
