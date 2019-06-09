@@ -38,7 +38,7 @@ func (s *Server) moveLoop(ctx context.Context) error {
 func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) {
 	s.currMove = move.InstanceId
 	s.Log(fmt.Sprintf("Trying to move %v", s.currMove))
-	if move.GetBeforeContext() != nil && move.GetAfterContext() != nil && move.GetBeforeContext().Location != move.GetAfterContext().Location {
+	if move.GetBeforeContext() != nil && move.GetAfterContext() != nil && move.GetBeforeContext().Location != move.GetAfterContext().Location && move.GetAfterContext().After != nil {
 		s.Log(fmt.Sprintf("MOVE: %v", move.InstanceId))
 
 		//Raise an alarm if the move has no record
