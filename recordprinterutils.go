@@ -61,6 +61,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 			//Raise an alarm if the move context is incomplete
 			if (move.GetBeforeContext() == nil || move.GetAfterContext() == nil) ||
 				(move.GetBeforeContext().Before == nil && move.GetBeforeContext().After == nil) ||
+
 				(move.GetAfterContext().Before == nil || move.GetAfterContext().After == nil) {
 				s.Log(fmt.Sprintf("No context"))
 				s.lastIssue = "No Context"
@@ -68,12 +69,12 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 				return nil
 			}
 
-			if move.GetAfterContext().After.GetMetadata() == nil {
+			if move.Record.GetMetadata() == nil {
 				return fmt.Errorf("Record has no metadata")
 			}
 
 			// Only print if it's a FRESHMAN record
-			if move.GetAfterContext().After.GetMetadata().Category == pbrc.ReleaseMetadata_FRESHMAN {
+			if move.Record.GetMetadata().Category == pbrc.ReleaseMetadata_FRESHMAN {
 				lines := []string{fmt.Sprintf("%v: %v -> %v\n", move.Record.GetRelease().Title, move.GetBeforeContext().Location, move.GetAfterContext().Location)}
 				lines = append(lines, fmt.Sprintf(" (Slot %v)\n", move.GetAfterContext().Slot))
 				if move.GetAfterContext().GetBefore() != nil {
