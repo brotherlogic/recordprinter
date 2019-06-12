@@ -69,7 +69,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 			}
 
 			if move.GetAfterContext().After.GetMetadata() == nil {
-				return fmt.Errorf("Record has no metadata!")
+				return fmt.Errorf("Record has no metadata")
 			}
 
 			// Only print if it's a FRESHMAN record
