@@ -28,14 +28,17 @@ func (s *Server) moveLoop(ctx context.Context) error {
 	})
 
 	for _, move := range moves {
-		s.move(ctx, move)
+		err := s.move(ctx, move)
+		if err != nil {
+			return err
+		}
 	}
 
 	s.lastIssue = "No issues"
 	return nil
 }
 
-func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) {
+func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 	s.currMove = move.InstanceId
 	s.Log(fmt.Sprintf("Trying to move %v", s.currMove))
 	if move.GetBeforeContext() != nil && move.GetAfterContext() != nil && move.GetBeforeContext().Location != move.GetAfterContext().Location && move.GetAfterContext().After != nil {
@@ -46,7 +49,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) {
 			s.Log(fmt.Sprintf("Record missing"))
 			s.lastIssue = "Record is missing from the move"
 			s.RaiseIssue(ctx, "Record is missing from move", fmt.Sprintf("Move regarding %v is missing the record information", move.InstanceId), false)
-			return
+			return nil
 		}
 
 		s.Log(fmt.Sprintf("%v and %v", move.GetBeforeContext().Location, move.GetAfterContext().Location))
@@ -62,7 +65,11 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) {
 				s.Log(fmt.Sprintf("No context"))
 				s.lastIssue = "No Context"
 				s.RaiseIssue(ctx, "Context is missing from move", fmt.Sprintf("Move regarding %v is missing the full context %v -> %v", move.InstanceId, move.BeforeContext, move.AfterContext), false)
-				return
+				return nil
+			}
+
+			if move.GetAfterContext().After.GetMetadata() == nil {
+				return fmt.Errorf("Record has no metadata!")
 			}
 
 			// Only print if it's a FRESHMAN record
@@ -82,7 +89,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) {
 				err := s.bridge.print(ctx, lines)
 				if err != nil {
 					s.Log(fmt.Sprintf("Error printing move: %v", err))
-					return
+					return nil
 				}
 			}
 
@@ -104,5 +111,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) {
 			s.Log(fmt.Sprintf("Error clearing move: %v", err))
 		}
 	}
+
+	return nil
 
 }
