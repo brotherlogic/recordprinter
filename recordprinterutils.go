@@ -94,10 +94,13 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 				}
 			}
 
-			err := s.bridge.clearMove(ctx, move)
-			if err != nil {
-				s.lastIssue = fmt.Sprintf("%v", err)
-				s.Log(fmt.Sprintf("Error clearing move: %v", err))
+			// Only clear SOLD records
+			if move.Record.GetMetadata().Category == pbrc.ReleaseMetadata_SOLD {
+				err := s.bridge.clearMove(ctx, move)
+				if err != nil {
+					s.lastIssue = fmt.Sprintf("%v", err)
+					s.Log(fmt.Sprintf("Error clearing move: %v", err))
+				}
 			}
 
 		}
