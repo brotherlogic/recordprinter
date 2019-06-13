@@ -73,8 +73,9 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 				return fmt.Errorf("Record has no metadata")
 			}
 
-			// Only print if it's a FRESHMAN record
-			if move.Record.GetMetadata().Category == pbrc.ReleaseMetadata_FRESHMAN {
+			// Only print if it's a FRESHMAN record or it's listed to sell
+			if move.Record.GetMetadata().Category == pbrc.ReleaseMetadata_FRESHMAN ||
+				move.Record.GetMetadata().Category == pbrc.ReleaseMetadata_LISTED_TO_SELL {
 				lines := []string{fmt.Sprintf("%v: %v -> %v\n", move.Record.GetRelease().Title, move.GetBeforeContext().Location, move.GetAfterContext().Location)}
 				lines = append(lines, fmt.Sprintf(" (Slot %v)\n", move.GetAfterContext().Slot))
 				if move.GetAfterContext().GetBefore() != nil {
