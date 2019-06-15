@@ -73,6 +73,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 				return fmt.Errorf("Record has no metadata")
 			}
 
+			marked := false
 			// Only print if it's a FRESHMAN record or it's listed to sell
 			if move.Record.GetMetadata().Category == pbrc.ReleaseMetadata_FRESHMAN ||
 				move.Record.GetMetadata().Category == pbrc.ReleaseMetadata_LISTED_TO_SELL {
@@ -93,10 +94,11 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 					s.Log(fmt.Sprintf("Error printing move: %v", err))
 					return nil
 				}
+				marked = true
 			}
 
 			// Only clear SOLD records
-			if move.Record.GetMetadata().Category == pbrc.ReleaseMetadata_SOLD {
+			if marked || move.Record.GetMetadata().Category == pbrc.ReleaseMetadata_SOLD {
 				err := s.bridge.clearMove(ctx, move)
 				if err != nil {
 					s.lastIssue = fmt.Sprintf("%v", err)
