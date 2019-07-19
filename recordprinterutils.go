@@ -99,7 +99,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 
 			// Only clear SOLD records
 			if marked || move.Record.GetMetadata().Category == pbrc.ReleaseMetadata_SOLD ||
-				move.Record.GetMetadata().Category == pbrc.ReleaseMetadatra_SOLD_ARCHIVE {
+				move.Record.GetMetadata().Category == pbrc.ReleaseMetadata_SOLD_ARCHIVE {
 				err := s.bridge.clearMove(ctx, move)
 				if err != nil {
 					s.lastIssue = fmt.Sprintf("%v", err)
