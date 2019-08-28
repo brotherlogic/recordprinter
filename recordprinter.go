@@ -277,7 +277,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Registration Error: %v", err)
 	}
-	server.RegisterRepeatingTask(server.moveLoop, "move_loop", time.Minute*5)
+	server.RegisterRepeatingTask(server.moveLoop, "move_loop", time.Minute*30)
 
 	fmt.Printf("%v", server.Serve())
 }

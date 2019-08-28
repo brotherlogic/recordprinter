@@ -18,7 +18,6 @@ func (s *Server) moveLoop(ctx context.Context) error {
 
 	if err != nil {
 		s.lastIssue = fmt.Sprintf("%v", err)
-		s.Log(fmt.Sprintf("Error getting moves: %v", err))
 		return err
 	}
 
@@ -40,19 +39,14 @@ func (s *Server) moveLoop(ctx context.Context) error {
 
 func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 	s.currMove = move.InstanceId
-	s.Log(fmt.Sprintf("Trying to move %v", s.currMove))
 	if move.GetBeforeContext() != nil && move.GetAfterContext() != nil && move.GetBeforeContext().Location != move.GetAfterContext().Location && move.GetAfterContext().After != nil {
-		s.Log(fmt.Sprintf("MOVE: %v", move.InstanceId))
 
 		//Raise an alarm if the move has no record
 		if move.Record == nil {
-			s.Log(fmt.Sprintf("Record missing"))
 			s.lastIssue = "Record is missing from the move"
 			s.RaiseIssue(ctx, "Record is missing from move", fmt.Sprintf("Move regarding %v is missing the record information", move.InstanceId), false)
 			return nil
 		}
-
-		s.Log(fmt.Sprintf("%v and %v", move.GetBeforeContext().Location, move.GetAfterContext().Location))
 
 		//We don't need to print purgatory or google_play moves
 		if (move.GetBeforeContext().Location != "Purgatory" && move.GetAfterContext().Location != "Purgatory") &&
@@ -63,7 +57,6 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 				(move.GetBeforeContext().Before == nil && move.GetBeforeContext().After == nil) ||
 
 				(move.GetAfterContext().Before == nil || move.GetAfterContext().After == nil) {
-				s.Log(fmt.Sprintf("No context"))
 				s.lastIssue = "No Context"
 				s.RaiseIssue(ctx, "Context is missing from move", fmt.Sprintf("Move regarding %v is missing the full context %v -> %v", move.InstanceId, move.BeforeContext, move.AfterContext), false)
 				return nil
@@ -87,11 +80,8 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 					lines = append(lines, fmt.Sprintf(" %v\n", move.GetAfterContext().GetAfter().GetRelease().Title))
 				}
 
-				s.Log(fmt.Sprintf("DELIVER: %v", move.InstanceId))
-
 				err := s.bridge.print(ctx, lines)
 				if err != nil {
-					s.Log(fmt.Sprintf("Error printing move: %v", err))
 					return nil
 				}
 				marked = true
@@ -103,7 +93,6 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 				err := s.bridge.clearMove(ctx, move)
 				if err != nil {
 					s.lastIssue = fmt.Sprintf("%v", err)
-					s.Log(fmt.Sprintf("Error clearing move: %v", err))
 				}
 			}
 
@@ -112,11 +101,9 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 
 	tv := time.Now().Sub(time.Unix(move.MoveDate, 0))
 	if move.GetBeforeContext() != nil && move.GetAfterContext() != nil && tv > time.Hour*2 && (move.GetBeforeContext().Location == move.GetAfterContext().Location || move.GetBeforeContext().Location == "Purgatory") {
-		s.Log(fmt.Sprintf("CLearning move (matching location %v [%v -> %v])", move.InstanceId, move.GetBeforeContext().Location))
 		err := s.bridge.clearMove(ctx, move)
 		if err != nil {
 			s.lastIssue = fmt.Sprintf("%v", err)
-			s.Log(fmt.Sprintf("Error clearing move: %v", err))
 		}
 	}
 
