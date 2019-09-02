@@ -57,9 +57,11 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 				(move.GetBeforeContext().Before == nil && move.GetBeforeContext().After == nil) ||
 
 				(move.GetAfterContext().Before == nil || move.GetAfterContext().After == nil) {
-				s.lastIssue = "No Context"
-				s.RaiseIssue(ctx, "Context is missing from move", fmt.Sprintf("Move regarding %v is missing the full context %v -> %v", move.InstanceId, move.BeforeContext, move.AfterContext), false)
-				return nil
+				if move.GetBeforeContext().Location != "Bandcamp" {
+					s.lastIssue = "No Context"
+					s.RaiseIssue(ctx, "Context is missing from move", fmt.Sprintf("Move regarding %v is missing the full context %v -> %v", move.InstanceId, move.BeforeContext, move.AfterContext), false)
+					return nil
+				}
 			}
 
 			if move.Record.GetMetadata() == nil {
