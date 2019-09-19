@@ -46,7 +46,7 @@ func getRecord(ctx context.Context, instanceID int32) (*pbrc.Record, error) {
 	}
 
 	client := pbrc.NewRecordCollectionServiceClient(conn)
-	r, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Filter: &pbrc.Record{Release: &pbgd.Release{InstanceId: instanceID}}})
+	r, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Caller: "recordprinter-getrecord", Filter: &pbrc.Record{Release: &pbgd.Release{InstanceId: instanceID}}})
 	if err != nil {
 		return &pbrc.Record{}, err
 	}
@@ -136,7 +136,7 @@ func getReleaseString(ctx context.Context, instanceID int32) (string, error) {
 	}
 
 	client := pbrc.NewRecordCollectionServiceClient(conn)
-	rel, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Force: true, Filter: &pbrc.Record{Release: &pbgd.Release{InstanceId: instanceID}}})
+	rel, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Caller: "recordprinter-geetstring", Force: true, Filter: &pbrc.Record{Release: &pbgd.Release{InstanceId: instanceID}}})
 	if err != nil {
 		return "", err
 	}
