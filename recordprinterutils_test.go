@@ -166,6 +166,7 @@ func (t *testBridge) print(ctx context.Context, lines []string) error {
 func InitTestServer() *Server {
 	s := Init()
 	s.SkipLog = true
+	s.bridge = &testBridge{}
 	return s
 }
 
@@ -221,7 +222,6 @@ func TestClearFail(t *testing.T) {
 
 func TestLocationMove(t *testing.T) {
 	s := InitTestServer()
-
 	s.move(context.Background(), &pbrm.RecordMove{BeforeContext: &pbrm.Context{Location: "same"}, AfterContext: &pbrm.Context{Location: "same"}})
 
 }
