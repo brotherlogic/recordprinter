@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/brotherlogic/goserver"
-	"github.com/brotherlogic/goserver/utils"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
@@ -33,41 +32,12 @@ type prodBridge struct {
 	dial func(server string) (*grpc.ClientConn, error)
 }
 
-func getRecord(ctx context.Context, instanceID int32) (*pbrc.Record, error) {
-	host, port, err := utils.Resolve("recordcollection")
-	if err != nil {
-		return &pbrc.Record{}, err
-	}
-	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
-	defer conn.Close()
-
-	if err != nil {
-		return &pbrc.Record{}, err
-	}
-
-	client := pbrc.NewRecordCollectionServiceClient(conn)
-	r, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Caller: "recordprinter-getrecord", Filter: &pbrc.Record{Release: &pbgd.Release{InstanceId: instanceID}}})
-	if err != nil {
-		return &pbrc.Record{}, err
-	}
-
-	if len(r.GetRecords()) == 0 {
-		log.Fatalf("Unable to get record: %v", instanceID)
-	}
-	return r.GetRecords()[0], nil
-}
-
-func getFolder(ctx context.Context, folderID int32) (string, error) {
-	host, port, err := utils.Resolve("recordsorganiser")
+func (p *prodBridge) getFolder(ctx context.Context, folderID int32) (string, error) {
+	conn, err := p.dial("recordsorganiser")
 	if err != nil {
 		return "", err
 	}
-	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
 	defer conn.Close()
-
-	if err != nil {
-		return "", err
-	}
 
 	client := pbro.NewOrganiserServiceClient(conn)
 	r, err := client.GetQuota(ctx, &pbro.QuotaRequest{FolderId: folderID})
@@ -78,17 +48,12 @@ func getFolder(ctx context.Context, folderID int32) (string, error) {
 	return r.LocationName, nil
 }
 
-func getLocation(ctx context.Context, rec *pbrc.Record, folder string) ([]string, error) {
-	host, port, err := utils.Resolve("recordsorganiser")
+func (p *prodBridge) getLocation(ctx context.Context, rec *pbrc.Record, folder string) ([]string, error) {
+	conn, err := p.dial("recordsorganiser")
 	if err != nil {
 		return []string{}, err
 	}
-	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
 	defer conn.Close()
-
-	if err != nil {
-		return []string{}, err
-	}
 
 	client := pbro.NewOrganiserServiceClient(conn)
 	location, err := client.Locate(ctx, &pbro.LocateRequest{InstanceId: rec.GetRelease().InstanceId})
@@ -100,19 +65,19 @@ func getLocation(ctx context.Context, rec *pbrc.Record, folder string) ([]string
 		if r.GetInstanceId() == rec.GetRelease().InstanceId {
 			str = append(str, fmt.Sprintf("  Slot %v\n", r.GetSlot()))
 			if i > 0 {
-				rString, err := getReleaseString(ctx, location.GetFoundLocation().GetReleasesLocation()[i-1].InstanceId)
+				rString, err := p.getReleaseString(ctx, location.GetFoundLocation().GetReleasesLocation()[i-1].InstanceId)
 				if err != nil {
 					return []string{}, err
 				}
 				str = append(str, fmt.Sprintf("  %v. %v\n", i-1, rString))
 			}
-			rString, err := getReleaseString(ctx, location.GetFoundLocation().GetReleasesLocation()[i].InstanceId)
+			rString, err := p.getReleaseString(ctx, location.GetFoundLocation().GetReleasesLocation()[i].InstanceId)
 			if err != nil {
 				return []string{}, err
 			}
 			str = append(str, fmt.Sprintf("  %v. %v\n", i, rString))
 			if i < len(location.GetFoundLocation().GetReleasesLocation())-1 {
-				rString, err := getReleaseString(ctx, location.GetFoundLocation().GetReleasesLocation()[i+1].InstanceId)
+				rString, err := p.getReleaseString(ctx, location.GetFoundLocation().GetReleasesLocation()[i+1].InstanceId)
 				if err != nil {
 					return []string{}, err
 				}
@@ -123,17 +88,12 @@ func getLocation(ctx context.Context, rec *pbrc.Record, folder string) ([]string
 	return str, nil
 }
 
-func getReleaseString(ctx context.Context, instanceID int32) (string, error) {
-	host, port, err := utils.Resolve("recordcollection")
+func (p *prodBridge) getReleaseString(ctx context.Context, instanceID int32) (string, error) {
+	conn, err := p.dial("recordcollection")
 	if err != nil {
 		return "", err
 	}
-	conn, err := grpc.Dial(host+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
 	defer conn.Close()
-
-	if err != nil {
-		return "", err
-	}
 
 	client := pbrc.NewRecordCollectionServiceClient(conn)
 	rel, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Caller: "recordprinter-geetstring", Force: true, Filter: &pbrc.Record{Release: &pbgd.Release{InstanceId: instanceID}}})
@@ -144,17 +104,17 @@ func getReleaseString(ctx context.Context, instanceID int32) (string, error) {
 }
 
 func (p *prodBridge) resolve(ctx context.Context, move *pbrm.RecordMove) ([]string, error) {
-	f1, err := getFolder(ctx, move.FromFolder)
+	f1, err := p.getFolder(ctx, move.FromFolder)
 	if err != nil {
 		return []string{}, err
 	}
 
-	f2, err := getFolder(ctx, move.ToFolder)
+	f2, err := p.getFolder(ctx, move.ToFolder)
 	if err != nil {
 		return []string{}, err
 	}
 
-	loc, err := getLocation(ctx, move.Record, f2)
+	loc, err := p.getLocation(ctx, move.Record, f2)
 	if err != nil {
 		return []string{}, err
 	}
