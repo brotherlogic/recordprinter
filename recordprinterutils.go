@@ -46,21 +46,6 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 		if (move.GetBeforeContext().Location != "Purgatory" && move.GetAfterContext().Location != "Purgatory") &&
 			(move.GetBeforeContext().Location != "Google Play" && move.GetAfterContext().Location != "Google Play") {
 
-			//Raise an alarm if the move context is incomplete
-			if (move.GetBeforeContext() == nil || move.GetAfterContext() == nil) ||
-				(move.GetBeforeContext().Before == nil && move.GetBeforeContext().After == nil) ||
-
-				(move.GetAfterContext().Before == nil || move.GetAfterContext().After == nil) {
-				if move.GetBeforeContext().Location != "Bandcamp" {
-					s.lastIssue = "No Context"
-					return fmt.Errorf("Move regarding %v is missing context", move.InstanceId)
-				}
-			}
-
-			if move.Record.GetMetadata() == nil {
-				return fmt.Errorf("Record has no metadata")
-			}
-
 			marked := false
 			// Only print if it's a FRESHMAN record or it's listed to sell
 			if move.Record.GetMetadata().Category == pbrc.ReleaseMetadata_FRESHMAN ||
