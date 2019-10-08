@@ -28,7 +28,7 @@ func (t *testBridge) resolve(ctx context.Context, move *pbrm.RecordMove) ([]stri
 	return []string{"hello", "there"}, nil
 }
 
-func (p *testBridge) getRecord(ctx context.Context, id int32) (*pbrc.Record, error) {
+func (t *testBridge) getRecord(ctx context.Context, id int32) (*pbrc.Record, error) {
 	return &pbrc.Record{Metadata: &pbrc.ReleaseMetadata{}}, nil
 }
 
