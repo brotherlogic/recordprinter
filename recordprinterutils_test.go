@@ -28,12 +28,16 @@ func (t *testBridge) resolve(ctx context.Context, move *pbrm.RecordMove) ([]stri
 	return []string{"hello", "there"}, nil
 }
 
+func (t *testBridge) getRecord(ctx context.Context, id int32) (*pbrc.Record, error) {
+	return &pbrc.Record{Metadata: &pbrc.ReleaseMetadata{}}, nil
+}
+
 func (t *testBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
 	if t.failMove {
 		return nil, fmt.Errorf("Built to fail")
 	}
 	if t.poorRecord {
-		return []*pbrm.RecordMove{&pbrm.RecordMove{InstanceId: int32(1234), BeforeContext: &pbrm.Context{Location: "Before", Before: &pbrc.Record{Release: &pbgd.Release{Title: "donkey"}}}, AfterContext: &pbrm.Context{Before: &pbrc.Record{Release: &pbgd.Release{Title: "magic"}}, After: &pbrc.Record{Release: &pbgd.Release{Title: "magic"}}}}}, nil
+		return []*pbrm.RecordMove{&pbrm.RecordMove{InstanceId: int32(1234), BeforeContext: &pbrm.Context{Location: "Before", BeforeInstance: 1}, AfterContext: &pbrm.Context{BeforeInstance: 1, AfterInstance: 1}}}, nil
 	}
 
 	if t.poorContext {

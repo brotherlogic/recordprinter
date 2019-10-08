@@ -26,10 +26,26 @@ type Bridge interface {
 	clearMove(ctx context.Context, move *pbrm.RecordMove) error
 	print(ctx context.Context, lines []string) error
 	resolve(ctx context.Context, move *pbrm.RecordMove) ([]string, error)
+	getRecord(ctx context.Context, id int32) (*pbrc.Record, error)
 }
 
 type prodBridge struct {
 	dial func(server string) (*grpc.ClientConn, error)
+}
+
+func (p *prodBridge) getRecord(ctx context.Context, id int32) (*pbrc.Record, error) {
+	conn, err := p.dial("recordcollection")
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	client := pbrc.NewRecordCollectionServiceClient(conn)
+	rel, err := client.GetRecord(ctx, &pbrc.GetRecordRequest{InstanceId: id})
+	if err != nil {
+		return nil, err
+	}
+	return rel.GetRecord(), err
 }
 
 func (p *prodBridge) getFolder(ctx context.Context, folderID int32) (string, error) {
