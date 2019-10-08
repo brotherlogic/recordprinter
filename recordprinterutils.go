@@ -99,7 +99,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 
 		}
 	} else {
-		return fmt.Errorf("Cannot process move: %v", move.InstanceId)
+		return fmt.Errorf("Cannot process move because it doesn't match the criteria: %v", move.InstanceId)
 	}
 
 	tv := time.Now().Sub(time.Unix(move.MoveDate, 0))
