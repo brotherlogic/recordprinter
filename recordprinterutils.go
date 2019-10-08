@@ -39,13 +39,13 @@ func (s *Server) moveLoop(ctx context.Context) error {
 
 func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 	s.currMove = move.InstanceId
+
 	if move.GetBeforeContext() != nil && move.GetAfterContext() != nil && move.GetBeforeContext().Location != move.GetAfterContext().Location && move.GetAfterContext().After != nil {
 
 		//Raise an alarm if the move has no record
 		if move.Record == nil {
 			s.lastIssue = "Record is missing from the move"
-			s.RaiseIssue(ctx, "Record is missing from move", fmt.Sprintf("Move regarding %v is missing the record information", move.InstanceId), false)
-			return nil
+			return fmt.Errorf("Move regarding %v is missing the record information", move.InstanceId)
 		}
 
 		//We don't need to print purgatory or google_play moves
@@ -59,8 +59,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 				(move.GetAfterContext().Before == nil || move.GetAfterContext().After == nil) {
 				if move.GetBeforeContext().Location != "Bandcamp" {
 					s.lastIssue = "No Context"
-					s.RaiseIssue(ctx, "Context is missing from move", fmt.Sprintf("Move regarding %v is missing the full context %v -> %v", move.InstanceId, move.BeforeContext, move.AfterContext), false)
-					return nil
+					return fmt.Errorf("Move regarding %v is missing context", move.InstanceId)
 				}
 			}
 
@@ -84,7 +83,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 
 				err := s.bridge.print(ctx, lines)
 				if err != nil {
-					return nil
+					return err
 				}
 				marked = true
 			}
@@ -94,18 +93,20 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 				move.Record.GetMetadata().Category == pbrc.ReleaseMetadata_SOLD_ARCHIVE {
 				err := s.bridge.clearMove(ctx, move)
 				if err != nil {
-					s.lastIssue = fmt.Sprintf("%v", err)
+					return err
 				}
 			}
 
 		}
+	} else {
+		return fmt.Errorf("Cannot process move: %v", move.InstanceId)
 	}
 
 	tv := time.Now().Sub(time.Unix(move.MoveDate, 0))
 	if move.GetBeforeContext() != nil && move.GetAfterContext() != nil && tv > time.Hour*2 && (move.GetBeforeContext().Location == move.GetAfterContext().Location || move.GetBeforeContext().Location == "Purgatory") {
 		err := s.bridge.clearMove(ctx, move)
 		if err != nil {
-			s.lastIssue = fmt.Sprintf("%v", err)
+			return err
 		}
 	}
 
