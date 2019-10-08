@@ -40,7 +40,7 @@ func (s *Server) moveLoop(ctx context.Context) error {
 func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 	s.currMove = move.InstanceId
 
-	if move.GetBeforeContext() != nil && move.GetAfterContext() != nil && move.GetBeforeContext().Location != move.GetAfterContext().Location && move.GetAfterContext().After != nil {
+	if move.GetBeforeContext() != nil && move.GetAfterContext() != nil && move.GetBeforeContext().Location != move.GetAfterContext().Location {
 
 		//Raise an alarm if the move has no record
 		if move.Record == nil {
