@@ -42,12 +42,6 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 
 	if move.GetBeforeContext() != nil && move.GetAfterContext() != nil && move.GetBeforeContext().Location != move.GetAfterContext().Location {
 
-		//Raise an alarm if the move has no record
-		if move.Record == nil {
-			s.lastIssue = "Record is missing from the move"
-			return fmt.Errorf("Move regarding %v is missing the record information", move.InstanceId)
-		}
-
 		//We don't need to print purgatory or google_play moves
 		if (move.GetBeforeContext().Location != "Purgatory" && move.GetAfterContext().Location != "Purgatory") &&
 			(move.GetBeforeContext().Location != "Google Play" && move.GetAfterContext().Location != "Google Play") {
