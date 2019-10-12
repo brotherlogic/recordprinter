@@ -12,7 +12,6 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	pbgd "github.com/brotherlogic/godiscogs"
 	pbg "github.com/brotherlogic/goserver/proto"
 	pbp "github.com/brotherlogic/printer/proto"
 	pbrc "github.com/brotherlogic/recordcollection/proto"
@@ -64,6 +63,14 @@ func (p *prodBridge) getFolder(ctx context.Context, folderID int32) (string, err
 	return r.LocationName, nil
 }
 
+func (p *prodBridge) getReleaseString(ctx context.Context, instanceID int32) (string, error) {
+	rel, err := p.getRecord(ctx, instanceID)
+	if err != nil {
+		return "", err
+	}
+	return rel.GetRelease().Title + " [" + strconv.Itoa(int(instanceID)) + "]", nil
+}
+
 func (p *prodBridge) getLocation(ctx context.Context, rec *pbrc.Record, folder string) ([]string, error) {
 	conn, err := p.dial("recordsorganiser")
 	if err != nil {
@@ -102,21 +109,6 @@ func (p *prodBridge) getLocation(ctx context.Context, rec *pbrc.Record, folder s
 		}
 	}
 	return str, nil
-}
-
-func (p *prodBridge) getReleaseString(ctx context.Context, instanceID int32) (string, error) {
-	conn, err := p.dial("recordcollection")
-	if err != nil {
-		return "", err
-	}
-	defer conn.Close()
-
-	client := pbrc.NewRecordCollectionServiceClient(conn)
-	rel, err := client.GetRecords(ctx, &pbrc.GetRecordsRequest{Caller: "recordprinter-geetstring", Force: true, Filter: &pbrc.Record{Release: &pbgd.Release{InstanceId: instanceID}}})
-	if err != nil {
-		return "", err
-	}
-	return rel.GetRecords()[0].GetRelease().Title + " [" + strconv.Itoa(int(instanceID)) + "]", nil
 }
 
 func (p *prodBridge) resolve(ctx context.Context, move *pbrm.RecordMove) ([]string, error) {
