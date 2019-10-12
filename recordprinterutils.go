@@ -65,7 +65,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 					}
 					lines = append(lines, fmt.Sprintf(" %v\n", bef.GetRelease().Title))
 				}
-				lines = append(lines, fmt.Sprintf(" %v\n", move.Record.GetRelease().Title))
+				lines = append(lines, fmt.Sprintf(" %v\n", record.GetRelease().Title))
 				if move.GetAfterContext().GetAfter() != nil {
 					aft, err := s.bridge.getRecord(ctx, move.GetAfterContext().GetAfterInstance())
 					if err != nil {
