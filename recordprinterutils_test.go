@@ -19,6 +19,7 @@ type testBridge struct {
 	poorRecord  bool
 	poorContext bool
 	multiple    bool
+	count       int
 }
 
 func (t *testBridge) resolve(ctx context.Context, move *pbrm.RecordMove) ([]string, error) {
@@ -29,7 +30,11 @@ func (t *testBridge) resolve(ctx context.Context, move *pbrm.RecordMove) ([]stri
 }
 
 func (t *testBridge) getRecord(ctx context.Context, id int32) (*pbrc.Record, error) {
-	return &pbrc.Record{Metadata: &pbrc.ReleaseMetadata{}}, nil
+	t.count--
+	if t.count == 0 {
+		return nil, fmt.Errorf("Built to fail")
+	}
+	return &pbrc.Record{Release: &pbgd.Release{}, Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_LISTED_TO_SELL}}, nil
 }
 
 func (t *testBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
@@ -177,6 +182,21 @@ func InitTestServer() *Server {
 func TestMove(t *testing.T) {
 	s := InitTestServer()
 	s.bridge = &testBridge{}
+	s.moveLoop(context.Background())
+}
+func TestMoveFail1(t *testing.T) {
+	s := InitTestServer()
+	s.bridge = &testBridge{count: 1}
+	s.moveLoop(context.Background())
+}
+func TestMoveFail2(t *testing.T) {
+	s := InitTestServer()
+	s.bridge = &testBridge{count: 2}
+	s.moveLoop(context.Background())
+}
+func TestMoveFail3(t *testing.T) {
+	s := InitTestServer()
+	s.bridge = &testBridge{count: 3}
 	s.moveLoop(context.Background())
 }
 
