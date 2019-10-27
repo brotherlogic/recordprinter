@@ -194,7 +194,7 @@ type Server struct {
 func Init() *Server {
 	s := &Server{
 		&goserver.GoServer{},
-		nil,
+		&pb.Config{},
 		&prodBridge{},
 		0,
 		time.Unix(0, 0),
