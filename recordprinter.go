@@ -16,7 +16,13 @@ import (
 	pbp "github.com/brotherlogic/printer/proto"
 	pbrc "github.com/brotherlogic/recordcollection/proto"
 	pbrm "github.com/brotherlogic/recordmover/proto"
+	pb "github.com/brotherlogic/recordprinter/proto"
 	pbro "github.com/brotherlogic/recordsorganiser/proto"
+)
+
+const (
+	// KEY - where the wants are stored
+	KEY = "/github.com/brotherlogic/recordprinter/config"
 )
 
 // Bridge link to other services
@@ -176,6 +182,7 @@ func (p *prodBridge) print(ctx context.Context, lines []string) error {
 //Server main server type
 type Server struct {
 	*goserver.GoServer
+	config    *pb.Config
 	bridge    Bridge
 	count     int64
 	lastCount time.Time
@@ -187,6 +194,7 @@ type Server struct {
 func Init() *Server {
 	s := &Server{
 		&goserver.GoServer{},
+		nil,
 		&prodBridge{},
 		0,
 		time.Unix(0, 0),
@@ -212,14 +220,35 @@ func (s *Server) Shutdown(ctx context.Context) error {
 	return nil
 }
 
+func (s *Server) load(ctx context.Context) error {
+	config := &pb.Config{}
+	data, _, err := s.KSclient.Read(ctx, KEY, config)
+
+	if err != nil {
+		return err
+	}
+
+	config = data.(*pb.Config)
+	return nil
+}
+
+func (s *Server) save(ctx context.Context) {
+	s.KSclient.Save(ctx, KEY, s.config)
+}
+
 // Mote promotes/demotes this server
 func (s *Server) Mote(ctx context.Context, master bool) error {
+	if master {
+		return s.load(ctx)
+	}
+
 	return nil
 }
 
 // GetState gets the state of the server
 func (s *Server) GetState() []*pbg.State {
 	return []*pbg.State{
+		&pbg.State{Key: "last_time", TimeValue: s.config.LastPrint},
 		&pbg.State{Key: "curr_count", Value: s.count},
 		&pbg.State{Key: "last_count", Text: fmt.Sprintf("%v", s.lastCount)},
 		&pbg.State{Key: "error", Text: s.lastIssue},

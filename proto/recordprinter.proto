@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package recordwants;
+
+message Config {
+  int64 last_print = 1;
+}
