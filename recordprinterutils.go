@@ -93,14 +93,6 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 		}
 	}
 
-	tv := time.Now().Sub(time.Unix(move.MoveDate, 0))
-	if move.GetBeforeContext() != nil && move.GetAfterContext() != nil && tv > time.Hour*2 && (move.GetBeforeContext().Location == move.GetAfterContext().Location || move.GetBeforeContext().Location == "Purgatory") {
-		err := s.bridge.clearMove(ctx, move)
-		if err != nil {
-			return err
-		}
-	}
-
 	return nil
 
 }

@@ -13,6 +13,7 @@ import (
 	"google.golang.org/grpc"
 
 	pbg "github.com/brotherlogic/goserver/proto"
+	"github.com/brotherlogic/goserver/utils"
 	pbp "github.com/brotherlogic/printer/proto"
 	pbrc "github.com/brotherlogic/recordcollection/proto"
 	pbrm "github.com/brotherlogic/recordmover/proto"
@@ -245,6 +246,13 @@ func (s *Server) Mote(ctx context.Context, master bool) error {
 	return nil
 }
 
+func (s *Server) checkTime(ctx context.Context) error {
+	if time.Now().Sub(time.Unix(s.config.LastPrint, 0)) > time.Hour*24 {
+		s.RaiseIssue(ctx, "No Prints", fmt.Sprintf("No prints since %v", time.Unix(s.config.LastPrint, 0)), false)
+	}
+	return nil
+}
+
 // GetState gets the state of the server
 func (s *Server) GetState() []*pbg.State {
 	return []*pbg.State{
@@ -258,6 +266,7 @@ func (s *Server) GetState() []*pbg.State {
 
 func main() {
 	var quiet = flag.Bool("quiet", false, "Show all output")
+	var init = flag.Bool("init", false, "Show all output")
 	flag.Parse()
 
 	//Turn off logging
@@ -274,7 +283,18 @@ func main() {
 	if err != nil {
 		log.Fatalf("Registration Error: %v", err)
 	}
+
+	if *init {
+		ctx, cancel := utils.BuildContext("recordprinter", "recordprinter")
+		defer cancel()
+
+		err := server.KSclient.Save(ctx, KEY, &pb.Config{LastPrint: time.Now().Unix()})
+		fmt.Printf("Initialised: %v\n", err)
+		return
+	}
+
 	server.RegisterRepeatingTask(server.moveLoop, "move_loop", time.Minute*30)
+	server.RegisterRepeatingTask(server.checkTime, "check_time", time.Hour)
 
 	fmt.Printf("%v", server.Serve())
 }
