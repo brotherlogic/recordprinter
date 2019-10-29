@@ -75,6 +75,8 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 				}
 
 				err := s.bridge.print(ctx, lines)
+				s.config.LastPrint = time.Now().Unix()
+				s.save(ctx)
 				if err != nil {
 					return err
 				}
