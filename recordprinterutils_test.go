@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/brotherlogic/keystore/client"
 	"golang.org/x/net/context"
 
 	pbgd "github.com/brotherlogic/godiscogs"
@@ -175,6 +176,7 @@ func (t *testBridge) print(ctx context.Context, lines []string) error {
 func InitTestServer() *Server {
 	s := Init()
 	s.SkipLog = true
+	s.GoServer.KSclient = *keystoreclient.GetTestClient(".test")
 	s.bridge = &testBridge{}
 	return s
 }
