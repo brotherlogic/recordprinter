@@ -30,13 +30,14 @@ const (
 type Bridge interface {
 	getMoves(ctx context.Context) ([]*pbrm.RecordMove, error)
 	clearMove(ctx context.Context, move *pbrm.RecordMove) error
-	print(ctx context.Context, lines []string) error
+	print(ctx context.Context, lines []string, move *pbrm.RecordMove) error
 	resolve(ctx context.Context, move *pbrm.RecordMove) ([]string, error)
 	getRecord(ctx context.Context, id int32) (*pbrc.Record, error)
 }
 
 type prodBridge struct {
-	dial func(server string) (*grpc.ClientConn, error)
+	dial       func(server string) (*grpc.ClientConn, error)
+	raiseIssue func(ctx context.Context, name string, body string, super bool)
 }
 
 func (p *prodBridge) getRecord(ctx context.Context, id int32) (*pbrc.Record, error) {
@@ -168,7 +169,16 @@ func (p *prodBridge) clearMove(ctx context.Context, move *pbrm.RecordMove) error
 	return err
 }
 
-func (p *prodBridge) print(ctx context.Context, lines []string) error {
+func (p *prodBridge) print(ctx context.Context, lines []string, move *pbrm.RecordMove) error {
+
+	superstring := fmt.Sprintf("From %v\n\n", move)
+	for _, line := range lines {
+		superstring += line + "\n"
+	}
+
+	p.raiseIssue(ctx, "Would print", superstring, false)
+	return fmt.Errorf("Failing")
+
 	conn, err := p.dial("printer")
 	if err != nil {
 		return err
@@ -202,7 +212,7 @@ func Init() *Server {
 		"",
 		0,
 	}
-	s.bridge = &prodBridge{s.DialMaster}
+	s.bridge = &prodBridge{s.DialMaster, s.RaiseIssue}
 	return s
 }
 

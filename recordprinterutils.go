@@ -74,7 +74,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 					lines = append(lines, fmt.Sprintf(" %v\n", aft.GetRelease().Title))
 				}
 
-				err := s.bridge.print(ctx, lines)
+				err := s.bridge.print(ctx, lines, move)
 				s.config.LastPrint = time.Now().Unix()
 				s.save(ctx)
 				if err != nil {
