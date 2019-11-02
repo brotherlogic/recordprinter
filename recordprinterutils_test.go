@@ -166,7 +166,7 @@ func (t *testBridge) clearMove(ctx context.Context, move *pbrm.RecordMove) error
 	return nil
 }
 
-func (t *testBridge) print(ctx context.Context, lines []string) error {
+func (t *testBridge) print(ctx context.Context, lines []string, move *pbrm.RecordMove) error {
 	if t.failPrint {
 		return fmt.Errorf("Built to fail")
 	}
