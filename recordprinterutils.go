@@ -53,6 +53,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 				return err
 			}
 
+			makeMove := false
 			// Only print if it's a FRESHMAN record or it's listed to sell
 			if record.GetMetadata().Category == pbrc.ReleaseMetadata_FRESHMAN ||
 				record.GetMetadata().Category == pbrc.ReleaseMetadata_LISTED_TO_SELL {
@@ -74,9 +75,10 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 						}
 						lines = append(lines, fmt.Sprintf(" %v\n", aft.GetRelease().Title))
 					}
+					makeMove = true
 				}
 
-				err := s.bridge.print(ctx, lines, move)
+				err := s.bridge.print(ctx, lines, move, makeMove)
 				s.config.LastPrint = time.Now().Unix()
 				s.save(ctx)
 				if err != nil {
