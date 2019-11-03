@@ -30,7 +30,7 @@ const (
 type Bridge interface {
 	getMoves(ctx context.Context) ([]*pbrm.RecordMove, error)
 	clearMove(ctx context.Context, move *pbrm.RecordMove) error
-	print(ctx context.Context, lines []string, move *pbrm.RecordMove) error
+	print(ctx context.Context, lines []string, move *pbrm.RecordMove, makeMove bool) error
 	resolve(ctx context.Context, move *pbrm.RecordMove) ([]string, error)
 	getRecord(ctx context.Context, id int32) (*pbrc.Record, error)
 }
@@ -169,15 +169,17 @@ func (p *prodBridge) clearMove(ctx context.Context, move *pbrm.RecordMove) error
 	return err
 }
 
-func (p *prodBridge) print(ctx context.Context, lines []string, move *pbrm.RecordMove) error {
+func (p *prodBridge) print(ctx context.Context, lines []string, move *pbrm.RecordMove, makeMove bool) error {
 
 	superstring := fmt.Sprintf("From %v\n\n", move)
 	for _, line := range lines {
 		superstring += line + "\n"
 	}
 
-	p.raiseIssue(ctx, "Would print", superstring, false)
-	return fmt.Errorf("Failing")
+	if !makeMove {
+		p.raiseIssue(ctx, "Would print", superstring, false)
+		return fmt.Errorf("Failing")
+	}
 
 	conn, err := p.dial("printer")
 	if err != nil {

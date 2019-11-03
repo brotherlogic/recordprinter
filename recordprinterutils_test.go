@@ -35,7 +35,7 @@ func (t *testBridge) getRecord(ctx context.Context, id int32) (*pbrc.Record, err
 	if t.count == 0 {
 		return nil, fmt.Errorf("Built to fail")
 	}
-	return &pbrc.Record{Release: &pbgd.Release{}, Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_LISTED_TO_SELL}}, nil
+	return &pbrc.Record{Release: &pbgd.Release{}, Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_FRESHMAN}}, nil
 }
 
 func (t *testBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
@@ -166,7 +166,7 @@ func (t *testBridge) clearMove(ctx context.Context, move *pbrm.RecordMove) error
 	return nil
 }
 
-func (t *testBridge) print(ctx context.Context, lines []string, move *pbrm.RecordMove) error {
+func (t *testBridge) print(ctx context.Context, lines []string, move *pbrm.RecordMove, makeMove bool) error {
 	if t.failPrint {
 		return fmt.Errorf("Built to fail")
 	}
