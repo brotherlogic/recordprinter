@@ -57,21 +57,23 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 			if record.GetMetadata().Category == pbrc.ReleaseMetadata_FRESHMAN ||
 				record.GetMetadata().Category == pbrc.ReleaseMetadata_LISTED_TO_SELL {
 				lines := []string{fmt.Sprintf("%v: %v -> %v\n", record.GetRelease().Title, move.GetBeforeContext().Location, move.GetAfterContext().Location)}
-				lines = append(lines, fmt.Sprintf(" (Slot %v)\n", move.GetAfterContext().Slot))
-				if move.GetAfterContext().GetBefore() != nil {
-					bef, err := s.bridge.getRecord(ctx, move.GetAfterContext().GetBeforeInstance())
-					if err != nil {
-						return err
+				if record.GetMetadata().Category == pbrc.ReleaseMetadata_FRESHMAN {
+					lines = append(lines, fmt.Sprintf(" (Slot %v)\n", move.GetAfterContext().Slot))
+					if move.GetAfterContext().GetBeforeInstance() != 0 {
+						bef, err := s.bridge.getRecord(ctx, move.GetAfterContext().GetBeforeInstance())
+						if err != nil {
+							return err
+						}
+						lines = append(lines, fmt.Sprintf(" %v\n", bef.GetRelease().Title))
 					}
-					lines = append(lines, fmt.Sprintf(" %v\n", bef.GetRelease().Title))
-				}
-				lines = append(lines, fmt.Sprintf(" %v\n", record.GetRelease().Title))
-				if move.GetAfterContext().GetAfter() != nil {
-					aft, err := s.bridge.getRecord(ctx, move.GetAfterContext().GetAfterInstance())
-					if err != nil {
-						return err
+					lines = append(lines, fmt.Sprintf(" %v\n", record.GetRelease().Title))
+					if move.GetAfterContext().GetAfterInstance() != 0 {
+						aft, err := s.bridge.getRecord(ctx, move.GetAfterContext().GetAfterInstance())
+						if err != nil {
+							return err
+						}
+						lines = append(lines, fmt.Sprintf(" %v\n", aft.GetRelease().Title))
 					}
-					lines = append(lines, fmt.Sprintf(" %v\n", aft.GetRelease().Title))
 				}
 
 				err := s.bridge.print(ctx, lines, move)
