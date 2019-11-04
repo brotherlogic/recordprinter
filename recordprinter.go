@@ -261,6 +261,7 @@ func (s *Server) Mote(ctx context.Context, master bool) error {
 func (s *Server) checkTime(ctx context.Context) error {
 	if time.Now().Sub(time.Unix(s.config.LastPrint, 0)) > time.Hour*24 {
 		s.RaiseIssue(ctx, "No Prints", fmt.Sprintf("No prints since %v", time.Unix(s.config.LastPrint, 0)), false)
+		return fmt.Errorf("Raising issue")
 	}
 	return nil
 }
