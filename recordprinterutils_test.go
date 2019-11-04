@@ -36,7 +36,7 @@ func (t *testBridge) getRecord(ctx context.Context, id int32) (*pbrc.Record, err
 	if t.count == 0 {
 		return nil, fmt.Errorf("Built to fail")
 	}
-	if !flip {
+	if !t.flip {
 		return &pbrc.Record{Release: &pbgd.Release{}, Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_FRESHMAN}}, nil
 	}
 	return &pbrc.Record{Release: &pbgd.Release{}, Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_LISTED_TO_SELL}}, nil
