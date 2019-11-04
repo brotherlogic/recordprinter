@@ -137,6 +137,34 @@ func (t *testBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
 		}, nil
 	}
 
+	if t.flip {
+		return []*pbrm.RecordMove{
+			&pbrm.RecordMove{
+				InstanceId: int32(1234),
+				Record: &pbrc.Record{
+					Release:  &pbgd.Release{InstanceId: 1234, Title: "madeup"},
+					Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_LISTED_TO_SELL},
+				},
+				BeforeContext: &pbrm.Context{
+					Location: "Before",
+					Before: &pbrc.Record{
+						Release:  &pbgd.Release{Title: "donkey"},
+						Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_LISTED_TO_SELL},
+					},
+					After: &pbrc.Record{Release: &pbgd.Release{Title: "donkey"},
+						Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_LISTED_TO_SELL},
+					},
+				},
+				AfterContext: &pbrm.Context{
+					Before: &pbrc.Record{
+						Release:  &pbgd.Release{Title: "magic"},
+						Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_LISTED_TO_SELL},
+					},
+					After: &pbrc.Record{Release: &pbgd.Release{Title: "magic"},
+						Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_LISTED_TO_SELL},
+					}}}}, nil
+	}
+
 	return []*pbrm.RecordMove{
 		&pbrm.RecordMove{
 			InstanceId: int32(1234),
