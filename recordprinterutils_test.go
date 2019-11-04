@@ -201,14 +201,30 @@ func TestMoveFail1(t *testing.T) {
 	s.bridge = &testBridge{count: 1}
 	s.moveLoop(context.Background())
 }
+func TestMoveFail1Other(t *testing.T) {
+	s := InitTestServer()
+	s.bridge = &testBridge{flip: true, count: 1}
+	s.moveLoop(context.Background())
+}
 func TestMoveFail2(t *testing.T) {
 	s := InitTestServer()
 	s.bridge = &testBridge{count: 2}
 	s.moveLoop(context.Background())
 }
+func TestMoveFail2Other(t *testing.T) {
+	s := InitTestServer()
+	s.bridge = &testBridge{flip: true, count: 2}
+	s.moveLoop(context.Background())
+}
+
 func TestMoveFail3(t *testing.T) {
 	s := InitTestServer()
 	s.bridge = &testBridge{count: 3}
+	s.moveLoop(context.Background())
+}
+func TestMoveFail3Other(t *testing.T) {
+	s := InitTestServer()
+	s.bridge = &testBridge{flip: true, count: 3}
 	s.moveLoop(context.Background())
 }
 
