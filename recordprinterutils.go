@@ -77,6 +77,25 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 					}
 					makeMove = true
 				}
+				if record.GetMetadata().Category == pbrc.ReleaseMetadata_LISTED_TO_SELL {
+					lines = append(lines, fmt.Sprintf(" (Slot %v)\n", move.GetBeforeContext().Slot))
+					if move.GetBeforeContext().GetBeforeInstance() != 0 {
+						bef, err := s.bridge.getRecord(ctx, move.GetBeforeContext().GetBeforeInstance())
+						if err != nil {
+							return err
+						}
+						lines = append(lines, fmt.Sprintf(" %v\n", bef.GetRelease().Title))
+					}
+					lines = append(lines, fmt.Sprintf(" %v\n", record.GetRelease().Title))
+					if move.GetBeforeContext().GetAfterInstance() != 0 {
+						aft, err := s.bridge.getRecord(ctx, move.GetBeforeContext().GetAfterInstance())
+						if err != nil {
+							return err
+						}
+						lines = append(lines, fmt.Sprintf(" %v\n", aft.GetRelease().Title))
+					}
+					makeMove = true
+				}
 
 				err := s.bridge.print(ctx, lines, move, makeMove)
 				s.config.LastPrint = time.Now().Unix()
