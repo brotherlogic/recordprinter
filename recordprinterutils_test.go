@@ -137,6 +137,34 @@ func (t *testBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
 		}, nil
 	}
 
+	if t.flip {
+		return []*pbrm.RecordMove{
+			&pbrm.RecordMove{
+				InstanceId: int32(1234),
+				Record: &pbrc.Record{
+					Release:  &pbgd.Release{InstanceId: 1234, Title: "madeup"},
+					Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_LISTED_TO_SELL},
+				},
+				BeforeContext: &pbrm.Context{
+					Location: "Before",
+					Before: &pbrc.Record{
+						Release:  &pbgd.Release{Title: "donkey"},
+						Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_LISTED_TO_SELL},
+					},
+					After: &pbrc.Record{Release: &pbgd.Release{Title: "donkey"},
+						Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_LISTED_TO_SELL},
+					},
+				},
+				AfterContext: &pbrm.Context{
+					Before: &pbrc.Record{
+						Release:  &pbgd.Release{Title: "magic"},
+						Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_LISTED_TO_SELL},
+					},
+					After: &pbrc.Record{Release: &pbgd.Release{Title: "magic"},
+						Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_LISTED_TO_SELL},
+					}}}}, nil
+	}
+
 	return []*pbrm.RecordMove{
 		&pbrm.RecordMove{
 			InstanceId: int32(1234),
@@ -201,14 +229,30 @@ func TestMoveFail1(t *testing.T) {
 	s.bridge = &testBridge{count: 1}
 	s.moveLoop(context.Background())
 }
+func TestMoveFail1Other(t *testing.T) {
+	s := InitTestServer()
+	s.bridge = &testBridge{flip: true, count: 1}
+	s.moveLoop(context.Background())
+}
 func TestMoveFail2(t *testing.T) {
 	s := InitTestServer()
 	s.bridge = &testBridge{count: 2}
 	s.moveLoop(context.Background())
 }
+func TestMoveFail2Other(t *testing.T) {
+	s := InitTestServer()
+	s.bridge = &testBridge{flip: true, count: 2}
+	s.moveLoop(context.Background())
+}
+
 func TestMoveFail3(t *testing.T) {
 	s := InitTestServer()
 	s.bridge = &testBridge{count: 3}
+	s.moveLoop(context.Background())
+}
+func TestMoveFail3Other(t *testing.T) {
+	s := InitTestServer()
+	s.bridge = &testBridge{flip: true, count: 3}
 	s.moveLoop(context.Background())
 }
 

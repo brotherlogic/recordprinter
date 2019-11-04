@@ -94,6 +94,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 						}
 						lines = append(lines, fmt.Sprintf(" %v\n", aft.GetRelease().Title))
 					}
+					makeMove = true
 				}
 
 				err := s.bridge.print(ctx, lines, move, makeMove)
