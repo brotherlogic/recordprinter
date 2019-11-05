@@ -241,7 +241,7 @@ func (s *Server) load(ctx context.Context) error {
 		return err
 	}
 
-	config = data.(*pb.Config)
+	s.config = data.(*pb.Config)
 	return nil
 }
 
