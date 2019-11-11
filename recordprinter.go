@@ -12,6 +12,7 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
+	pbgd "github.com/brotherlogic/godiscogs"
 	pbg "github.com/brotherlogic/goserver/proto"
 	"github.com/brotherlogic/goserver/utils"
 	pbp "github.com/brotherlogic/printer/proto"
@@ -41,6 +42,9 @@ type prodBridge struct {
 }
 
 func (p *prodBridge) getRecord(ctx context.Context, id int32) (*pbrc.Record, error) {
+	if id < -1 {
+		return &pbrc.Record{Release: &pbgd.Release{Title: "END OF SECTION"}}, nil
+	}
 	conn, err := p.dial("recordcollection")
 	if err != nil {
 		return nil, err
