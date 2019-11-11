@@ -246,6 +246,9 @@ func (s *Server) load(ctx context.Context) error {
 	}
 
 	s.config = data.(*pb.Config)
+	if s.config.LastPrint == 0 {
+		return fmt.Errorf("Unable to mote, dodgy data")
+	}
 	return nil
 }
 
