@@ -299,9 +299,9 @@ func main() {
 	server.Register = server
 	server.RPCTracing = true
 
-	err := server.RegisterServer("recordprinter", false)
+	err := server.RegisterServerV2("recordprinter", false, false)
 	if err != nil {
-		log.Fatalf("Registration Error: %v", err)
+		return
 	}
 
 	if *init {
