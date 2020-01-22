@@ -265,14 +265,6 @@ func (s *Server) Mote(ctx context.Context, master bool) error {
 	return nil
 }
 
-func (s *Server) checkTime(ctx context.Context) error {
-	if time.Now().Sub(time.Unix(s.config.LastPrint, 0)) > time.Hour*24 {
-		s.RaiseIssue(ctx, "No Prints", fmt.Sprintf("No prints since %v", time.Unix(s.config.LastPrint, 0)), false)
-		return fmt.Errorf("Raising issue")
-	}
-	return nil
-}
-
 // GetState gets the state of the server
 func (s *Server) GetState() []*pbg.State {
 	return []*pbg.State{
@@ -314,7 +306,6 @@ func main() {
 	}
 
 	server.RegisterRepeatingTask(server.moveLoop, "move_loop", time.Minute*30)
-	server.RegisterRepeatingTask(server.checkTime, "check_time", time.Hour)
 
 	fmt.Printf("%v", server.Serve())
 }
