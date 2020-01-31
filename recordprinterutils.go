@@ -44,7 +44,8 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 
 		//We don't need to print purgatory or google_play moves
 		if (move.GetBeforeContext().Location != "Purgatory" && move.GetAfterContext().Location != "Purgatory") &&
-			(move.GetBeforeContext().Location != "Google Play" && move.GetAfterContext().Location != "Google Play") {
+			(move.GetBeforeContext().Location != "Google Play" && move.GetAfterContext().Location != "Google Play") &&
+			move.GetAfterContext().Location != "Listening Pile" {
 
 			marked := false
 
