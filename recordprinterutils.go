@@ -59,6 +59,9 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 			if record.GetMetadata().Category == pbrc.ReleaseMetadata_FRESHMAN ||
 				record.GetMetadata().Category == pbrc.ReleaseMetadata_LISTED_TO_SELL {
 				lines := []string{fmt.Sprintf("%v: %v -> %v\n", record.GetRelease().Title, move.GetBeforeContext().Location, move.GetAfterContext().Location)}
+				if move.GetBeforeContext().Location == "Listening Pile" {
+					s.RaiseIssue(ctx, "MOVE", fmt.Sprintf("%v", move), false)
+				}
 				if record.GetMetadata().Category == pbrc.ReleaseMetadata_FRESHMAN {
 					lines = append(lines, fmt.Sprintf(" (Slot %v)\n", move.GetAfterContext().Slot))
 					if move.GetAfterContext().GetBeforeInstance() != 0 {
