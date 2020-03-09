@@ -39,25 +39,27 @@ func (s *Server) moveLoop(ctx context.Context) error {
 func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 	s.currMove = move.InstanceId
 
-	record, err := s.bridge.getRecord(ctx, move.InstanceId)
-	if err != nil {
-		return err
+	if move.GetBeforeContext() != nil && move.GetAfterContext() != nil {
+		record, err := s.bridge.getRecord(ctx, move.InstanceId)
+		if err != nil {
+			return err
+		}
+
+		lines := []string{fmt.Sprintf("%v: %v -> %v\n", record.GetRelease().Title, move.GetFromFolder(), move.GetToFolder())}
+
+		err = s.bridge.print(ctx, lines, move, true)
+		s.config.LastPrint = time.Now().Unix()
+		if err != nil {
+			return err
+		}
+
+		err = s.bridge.clearMove(ctx, move)
+		if err != nil {
+			return err
+		}
+
+		s.save(ctx)
 	}
-
-	lines := []string{fmt.Sprintf("%v: %v -> %v\n", record.GetRelease().Title, move.GetFromFolder(), move.GetToFolder())}
-
-	err = s.bridge.print(ctx, lines, move, true)
-	s.config.LastPrint = time.Now().Unix()
-	if err != nil {
-		return err
-	}
-
-	err = s.bridge.clearMove(ctx, move)
-	if err != nil {
-		return err
-	}
-
-	s.save(ctx)
 
 	return nil
 }
