@@ -7,7 +7,6 @@ import (
 
 	"golang.org/x/net/context"
 
-	pbrc "github.com/brotherlogic/recordcollection/proto"
 	pbrm "github.com/brotherlogic/recordmover/proto"
 )
 
@@ -40,88 +39,25 @@ func (s *Server) moveLoop(ctx context.Context) error {
 func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 	s.currMove = move.InstanceId
 
-	if move.GetBeforeContext() != nil && move.GetAfterContext() != nil && move.GetBeforeContext().Location != move.GetAfterContext().Location {
-
-		//We don't need to print purgatory or google_play moves
-		if (move.GetBeforeContext().Location != "Purgatory" && move.GetAfterContext().Location != "Purgatory") &&
-			(move.GetBeforeContext().Location != "Google Play" && move.GetAfterContext().Location != "Google Play") &&
-			move.GetAfterContext().Location != "Listening Pile" {
-
-			marked := false
-
-			record, err := s.bridge.getRecord(ctx, move.InstanceId)
-			if err != nil {
-				return err
-			}
-
-			makeMove := false
-			// Only print if it's a FRESHMAN record or it's listed to sell
-			if record.GetMetadata().Category == pbrc.ReleaseMetadata_FRESHMAN ||
-				record.GetMetadata().Category == pbrc.ReleaseMetadata_LISTED_TO_SELL {
-				lines := []string{fmt.Sprintf("%v: %v -> %v\n", record.GetRelease().Title, move.GetBeforeContext().Location, move.GetAfterContext().Location)}
-				if move.GetBeforeContext().Location == "Listening Pile" {
-					s.RaiseIssue(ctx, "MOVE", fmt.Sprintf("%v", move), false)
-				}
-				if record.GetMetadata().Category == pbrc.ReleaseMetadata_FRESHMAN {
-					lines = append(lines, fmt.Sprintf(" (Slot %v)\n", move.GetAfterContext().Slot))
-					if move.GetAfterContext().GetBeforeInstance() != 0 {
-						bef, err := s.bridge.getRecord(ctx, move.GetAfterContext().GetBeforeInstance())
-						if err != nil {
-							return err
-						}
-						lines = append(lines, fmt.Sprintf(" %v\n", bef.GetRelease().Title))
-					}
-					lines = append(lines, fmt.Sprintf(" %v\n", record.GetRelease().Title))
-					if move.GetAfterContext().GetAfterInstance() != 0 {
-						aft, err := s.bridge.getRecord(ctx, move.GetAfterContext().GetAfterInstance())
-						if err != nil {
-							return err
-						}
-						lines = append(lines, fmt.Sprintf(" %v\n", aft.GetRelease().Title))
-					}
-					makeMove = true
-				}
-				if record.GetMetadata().Category == pbrc.ReleaseMetadata_LISTED_TO_SELL {
-					lines = append(lines, fmt.Sprintf(" (Slot %v)\n", move.GetBeforeContext().Slot))
-					if move.GetBeforeContext().GetBeforeInstance() != 0 {
-						bef, err := s.bridge.getRecord(ctx, move.GetBeforeContext().GetBeforeInstance())
-						if err != nil {
-							return err
-						}
-						lines = append(lines, fmt.Sprintf(" %v\n", bef.GetRelease().Title))
-					}
-					lines = append(lines, fmt.Sprintf(" %v\n", record.GetRelease().Title))
-					if move.GetBeforeContext().GetAfterInstance() != 0 {
-						aft, err := s.bridge.getRecord(ctx, move.GetBeforeContext().GetAfterInstance())
-						if err != nil {
-							return err
-						}
-						lines = append(lines, fmt.Sprintf(" %v\n", aft.GetRelease().Title))
-					}
-					makeMove = true
-				}
-
-				err := s.bridge.print(ctx, lines, move, makeMove)
-				s.config.LastPrint = time.Now().Unix()
-				s.save(ctx)
-				if err != nil {
-					return err
-				}
-				marked = true
-			}
-
-			// Only clear SOLD records
-			if marked || record.GetMetadata().Category == pbrc.ReleaseMetadata_SOLD ||
-				record.GetMetadata().Category == pbrc.ReleaseMetadata_SOLD_ARCHIVE {
-				err := s.bridge.clearMove(ctx, move)
-				if err != nil {
-					return err
-				}
-			}
-
-		}
+	record, err := s.bridge.getRecord(ctx, move.InstanceId)
+	if err != nil {
+		return err
 	}
 
-	return nil
+	lines := []string{fmt.Sprintf("%v: %v -> %v\n", record.GetRelease().Title, move.GetFromFolder(), move.GetToFolder())}
 
+	err = s.bridge.print(ctx, lines, move, true)
+	s.config.LastPrint = time.Now().Unix()
+	if err != nil {
+		return err
+	}
+
+	err = s.bridge.clearMove(ctx, move)
+	if err != nil {
+		return err
+	}
+
+	s.save(ctx)
+
+	return nil
 }
