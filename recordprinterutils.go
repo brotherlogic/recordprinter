@@ -39,13 +39,13 @@ func (s *Server) moveLoop(ctx context.Context) error {
 func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 	s.currMove = move.InstanceId
 
-	if move.GetBeforeContext() != nil && move.GetAfterContext() != nil {
+	if move.GetBeforeContext().GetLocation() != "" && move.GetAfterContext().GetLocation() != "" {
 		record, err := s.bridge.getRecord(ctx, move.InstanceId)
 		if err != nil {
 			return err
 		}
 
-		lines := []string{fmt.Sprintf("%v: %v -> %v\n", record.GetRelease().Title, move.GetFromFolder(), move.GetToFolder())}
+		lines := []string{fmt.Sprintf("%v: %v -> %v\n", record.GetRelease().Title, move.GetBeforeContext().GetLocation(), move.GetAfterContext().GetLocation())}
 
 		err = s.bridge.print(ctx, lines, move, true)
 		s.config.LastPrint = time.Now().Unix()
