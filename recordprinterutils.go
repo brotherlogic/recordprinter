@@ -59,6 +59,8 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 		}
 
 		s.save(ctx)
+	} else {
+		s.RaiseIssue(ctx, "Record Print Issue", fmt.Sprintf("Move for %v is not able to be printed", move.GetInstanceId()), false)
 	}
 
 	return nil
