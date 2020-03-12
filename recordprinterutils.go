@@ -40,6 +40,12 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 	s.currMove = move.InstanceId
 
 	if move.GetBeforeContext().GetLocation() != "" && move.GetAfterContext().GetLocation() != "" {
+
+		// Short circuit if this is a within folder move
+		if move.GetBeforeContext().GetLocation() == move.GetAfterContext().GetLocation() {
+			return nil
+		}
+
 		record, err := s.bridge.getRecord(ctx, move.InstanceId)
 		if err != nil {
 			return err
