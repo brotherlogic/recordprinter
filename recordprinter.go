@@ -272,7 +272,7 @@ func (s *Server) GetState() []*pbg.State {
 		&pbg.State{Key: "curr_count", Value: s.count},
 		&pbg.State{Key: "last_count", Text: fmt.Sprintf("%v", s.lastCount)},
 		&pbg.State{Key: "error", Text: s.lastIssue},
-		&pbg.State{Key: "curr_move", Value: int64(s.currMove)},
+		&pbg.State{Key: "curr_print_move", Value: int64(s.currMove)},
 	}
 }
 
