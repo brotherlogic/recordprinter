@@ -57,6 +57,11 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 		}
 		lines := []string{fmt.Sprintf("%v - %v: %v -> %v\n", artistName, record.GetRelease().Title, move.GetBeforeContext().GetLocation(), move.GetAfterContext().GetLocation())}
 
+		if move.GetAfterContext().GetLocation() == "12s" {
+			lines = append(lines, fmt.Sprintf("Before: %v", move.GetAfterContext().GetBeforeInstance()))
+			lines = append(lines, fmt.Sprintf("After: %v", move.GetAfterContext().GetAfterInstance()))
+		}
+
 		err = s.bridge.print(ctx, lines, move, true)
 		s.config.LastPrint = time.Now().Unix()
 		if err != nil {
