@@ -47,7 +47,7 @@ func (t *testBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
 		return nil, fmt.Errorf("Built to fail")
 	}
 	if t.poorRecord {
-		return []*pbrm.RecordMove{&pbrm.RecordMove{InstanceId: int32(1234), BeforeContext: &pbrm.Context{Location: "Before", BeforeInstance: 1}, AfterContext: &pbrm.Context{BeforeInstance: 1, AfterInstance: 1}}}, nil
+		return []*pbrm.RecordMove{&pbrm.RecordMove{InstanceId: int32(1234), BeforeContext: &pbrm.Context{Location: "Before", BeforeInstance: 1}, AfterContext: &pbrm.Context{Location: "After", BeforeInstance: 1, AfterInstance: 1}}}, nil
 	}
 
 	if t.poorContext {
@@ -84,6 +84,7 @@ func (t *testBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
 					},
 				},
 				AfterContext: &pbrm.Context{
+					Location: "After",
 					Before: &pbrc.Record{
 						Release: &pbgd.Release{
 							Title:   "magic",
@@ -170,6 +171,7 @@ func (t *testBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
 					},
 				},
 				AfterContext: &pbrm.Context{
+					Location: "After",
 					Before: &pbrc.Record{
 						Release: &pbgd.Release{Title: "magic",
 							Artists: []*pbgd.Artist{&pbgd.Artist{Name: "hello"}},
@@ -207,6 +209,7 @@ func (t *testBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
 				},
 			},
 			AfterContext: &pbrm.Context{
+				Location: "After",
 				Before: &pbrc.Record{
 					Release: &pbgd.Release{Title: "magic",
 						Artists: []*pbgd.Artist{&pbgd.Artist{Name: "hello"}}},
