@@ -209,7 +209,7 @@ func (t *testBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
 				},
 			},
 			AfterContext: &pbrm.Context{
-				Location: "After",
+				Location: "12s",
 				Before: &pbrc.Record{
 					Release: &pbgd.Release{Title: "magic",
 						Artists: []*pbgd.Artist{&pbgd.Artist{Name: "hello"}}},
