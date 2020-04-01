@@ -25,6 +25,7 @@ func (s *Server) moveLoop(ctx context.Context) error {
 		return moves[i].MoveDate < moves[j].MoveDate
 	})
 
+	s.Log(fmt.Sprintf("Processing %v moves", len(moves)))
 	for _, move := range moves {
 		err := s.move(ctx, move)
 		if err != nil {
