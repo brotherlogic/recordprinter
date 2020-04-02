@@ -44,10 +44,10 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 
 		// Short circuit if this is a within folder move
 		if move.GetBeforeContext().GetLocation() == move.GetAfterContext().GetLocation() {
-			if move.GetToFolder() != move.GetFromFolder() {
-				s.RaiseIssue(ctx, "Weird Move", fmt.Sprintf("%v is a weird move", move), false)
+			if move.GetToFolder() == move.GetFromFolder() {
+				return nil
 			}
-			return nil
+			s.RaiseIssue(ctx, "Weird Move", fmt.Sprintf("%v is a weird move", move), false)
 		}
 
 		record, err := s.bridge.getRecord(ctx, move.InstanceId)
