@@ -48,6 +48,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 				return nil
 			}
 			s.RaiseIssue(ctx, "Weird Move", fmt.Sprintf("%v is a weird move", move), false)
+			return nil
 		}
 
 		record, err := s.bridge.getRecord(ctx, move.InstanceId)
