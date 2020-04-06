@@ -67,6 +67,17 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 			lines = append(lines, fmt.Sprintf("After: %v", move.GetAfterContext().GetAfterInstance()))
 		}
 
+		// Also add in the after surrounds
+		if move.GetAfterContext().GetBeforeInstance() != 0 {
+			bef, _ := s.bridge.getRecord(ctx, move.GetAfterContext().GetBeforeInstance())
+			lines = append(lines, fmt.Sprintf(" %v\n", bef.GetRelease().Title))
+		}
+		lines = append(lines, fmt.Sprintf(" %v\n", record.GetRelease().Title))
+		if move.GetAfterContext().GetAfterInstance() != 0 {
+			aft, _ := s.bridge.getRecord(ctx, move.GetAfterContext().GetAfterInstance())
+			lines = append(lines, fmt.Sprintf(" %v\n", aft.GetRelease().Title))
+		}
+
 		err = s.bridge.print(ctx, lines, move, true)
 		s.config.LastPrint = time.Now().Unix()
 		if err != nil {
