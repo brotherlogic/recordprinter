@@ -343,6 +343,14 @@ func TestListeningPileMove(t *testing.T) {
 	}
 }
 
+func TestSekkMove(t *testing.T) {
+	s := InitTestServer()
+	res := s.move(context.Background(), &pbrm.RecordMove{BeforeContext: &pbrm.Context{Location: "same"}, AfterContext: &pbrm.Context{Location: "Sell"}})
+	if res != nil {
+		t.Errorf("Bad move")
+	}
+}
+
 func TestLocationMoveDiffTo(t *testing.T) {
 	s := InitTestServer()
 	s.move(context.Background(), &pbrm.RecordMove{ToFolder: 1, FromFolder: 2, BeforeContext: &pbrm.Context{Location: "same"}, AfterContext: &pbrm.Context{Location: "same"}})
