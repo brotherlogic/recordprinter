@@ -62,20 +62,28 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 		}
 		lines := []string{fmt.Sprintf("%v - %v: %v -> %v\n", artistName, record.GetRelease().Title, move.GetBeforeContext().GetLocation(), move.GetAfterContext().GetLocation())}
 
-		if move.GetAfterContext().GetLocation() == "12s" {
-			lines = append(lines, fmt.Sprintf("Before: %v", move.GetAfterContext().GetBeforeInstance()))
-			lines = append(lines, fmt.Sprintf("After: %v", move.GetAfterContext().GetAfterInstance()))
+		// Also add in the after surrounds
+		surrounds := move.GetAfterContext()
+
+		if move.GetAfterContext().GetLocation() == "Listening Pile" {
+			surrounds = move.GetBeforeContext()
+			if surrounds.GetBeforeInstance() == 0 && surrounds.GetAfterInstance() == 0 {
+				s.RaiseIssue(ctx, "Weird Move", fmt.Sprintf("%v has not before context", move), false)
+				return nil
+			}
 		}
 
-		// Also add in the after surrounds
-		if move.GetAfterContext().GetBeforeInstance() != 0 {
-			bef, _ := s.bridge.getRecord(ctx, move.GetAfterContext().GetBeforeInstance())
-			lines = append(lines, fmt.Sprintf(" %v\n", bef.GetRelease().Title))
-		}
-		lines = append(lines, fmt.Sprintf(" %v\n", record.GetRelease().Title))
-		if move.GetAfterContext().GetAfterInstance() != 0 {
-			aft, _ := s.bridge.getRecord(ctx, move.GetAfterContext().GetAfterInstance())
-			lines = append(lines, fmt.Sprintf(" %v\n", aft.GetRelease().Title))
+		if surrounds != nil {
+			lines = append(lines, fmt.Sprintf("Slot %v", surrounds.GetSlot()))
+			if surrounds.GetBeforeInstance() != 0 {
+				bef, _ := s.bridge.getRecord(ctx, move.GetAfterContext().GetBeforeInstance())
+				lines = append(lines, fmt.Sprintf(" %v", bef.GetRelease().Title))
+			}
+			lines = append(lines, fmt.Sprintf(" %v", record.GetRelease().Title))
+			if move.GetAfterContext().GetAfterInstance() != 0 {
+				aft, _ := s.bridge.getRecord(ctx, move.GetAfterContext().GetAfterInstance())
+				lines = append(lines, fmt.Sprintf(" %v", aft.GetRelease().Title))
+			}
 		}
 
 		err = s.bridge.print(ctx, lines, move, true)
