@@ -73,6 +73,11 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 			}
 		}
 
+		// Don't show after context for sales
+		if move.GetAfterContext().GetLocation() == "Sell" {
+			surrounds = nil
+		}
+
 		if surrounds != nil {
 			lines = append(lines, fmt.Sprintf("Slot %v", surrounds.GetSlot()))
 			if surrounds.GetBeforeInstance() != 0 {
