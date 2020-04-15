@@ -1,6 +1,8 @@
 syntax = "proto3";
 
-package recordwants;
+package recordprinter;
+
+option go_package = ".;recordprinter";
 
 message Config {
   int64 last_print = 1;
