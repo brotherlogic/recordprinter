@@ -82,12 +82,12 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 			lines = append(lines, fmt.Sprintf("Slot %v", surrounds.GetSlot()))
 			if surrounds.GetBeforeInstance() != 0 {
 				bef, _ := s.bridge.getRecord(ctx, move.GetAfterContext().GetBeforeInstance())
-				lines = append(lines, fmt.Sprintf(" %v", bef.GetRelease().Title))
+				lines = append(lines, fmt.Sprintf(" %v", bef.GetRelease().GetTitle()))
 			}
 			lines = append(lines, fmt.Sprintf(" %v", record.GetRelease().Title))
 			if move.GetAfterContext().GetAfterInstance() != 0 {
 				aft, _ := s.bridge.getRecord(ctx, move.GetAfterContext().GetAfterInstance())
-				lines = append(lines, fmt.Sprintf(" %v", aft.GetRelease().Title))
+				lines = append(lines, fmt.Sprintf(" %v", aft.GetRelease().GetTitle()))
 			}
 		}
 
