@@ -92,7 +92,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 		}
 
 		// Don't print bandcamp moves, unless they're into digital
-		if record.GetMetadata().GetGoalFolder() != 1782105 || move.GetToFolder() != 268147 {
+		if record.GetMetadata().GetGoalFolder() != 1782105 && move.GetToFolder() != 268147 {
 			err = s.bridge.print(ctx, lines, move, true)
 			s.config.LastPrint = time.Now().Unix()
 			if err != nil {
