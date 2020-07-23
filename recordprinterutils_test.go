@@ -42,7 +42,7 @@ func (t *testBridge) getRecord(ctx context.Context, id int32) (*pbrc.Record, err
 	return &pbrc.Record{Release: &pbgd.Release{}, Metadata: &pbrc.ReleaseMetadata{Category: pbrc.ReleaseMetadata_LISTED_TO_SELL}}, nil
 }
 
-func (t *testBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
+func (t *testBridge) getMoves(ctx context.Context, id int32) ([]*pbrm.RecordMove, error) {
 	if t.failMove {
 		return nil, fmt.Errorf("Built to fail")
 	}
@@ -237,6 +237,7 @@ func (t *testBridge) print(ctx context.Context, lines []string, move *pbrm.Recor
 func InitTestServer() *Server {
 	s := Init()
 	s.SkipLog = true
+	s.SkipIssue = true
 	s.GoServer.KSclient = *keystoreclient.GetTestClient(".test")
 	s.bridge = &testBridge{}
 	return s
@@ -245,88 +246,88 @@ func InitTestServer() *Server {
 func TestMove(t *testing.T) {
 	s := InitTestServer()
 	s.bridge = &testBridge{}
-	s.moveLoop(context.Background())
+	s.moveLoop(context.Background(), -1)
 }
 func TestMoveFlip(t *testing.T) {
 	s := InitTestServer()
 	s.bridge = &testBridge{flip: true}
-	s.moveLoop(context.Background())
+	s.moveLoop(context.Background(), -1)
 }
 
 func TestMoveFail1(t *testing.T) {
 	s := InitTestServer()
 	s.bridge = &testBridge{count: 1}
-	s.moveLoop(context.Background())
+	s.moveLoop(context.Background(), -1)
 }
 func TestMoveFail1Other(t *testing.T) {
 	s := InitTestServer()
 	s.bridge = &testBridge{flip: true, count: 1}
-	s.moveLoop(context.Background())
+	s.moveLoop(context.Background(), -1)
 }
 func TestMoveFail2(t *testing.T) {
 	s := InitTestServer()
 	s.bridge = &testBridge{count: 2}
-	s.moveLoop(context.Background())
+	s.moveLoop(context.Background(), -1)
 }
 func TestMoveFail2Other(t *testing.T) {
 	s := InitTestServer()
 	s.bridge = &testBridge{flip: true, count: 2}
-	s.moveLoop(context.Background())
+	s.moveLoop(context.Background(), -1)
 }
 
 func TestMoveFail3(t *testing.T) {
 	s := InitTestServer()
 	s.bridge = &testBridge{count: 3}
-	s.moveLoop(context.Background())
+	s.moveLoop(context.Background(), -1)
 }
 func TestMoveFail3Other(t *testing.T) {
 	s := InitTestServer()
 	s.bridge = &testBridge{flip: true, count: 3}
-	s.moveLoop(context.Background())
+	s.moveLoop(context.Background(), -1)
 }
 
 func TestMultiMove(t *testing.T) {
 	s := InitTestServer()
 	s.bridge = &testBridge{multiple: true}
-	s.moveLoop(context.Background())
+	s.moveLoop(context.Background(), -1)
 }
 
 func TestMovePoor(t *testing.T) {
 	s := InitTestServer()
 	s.bridge = &testBridge{poorRecord: true}
-	s.moveLoop(context.Background())
+	s.moveLoop(context.Background(), -1)
 }
 
 func TestMovePoorContext(t *testing.T) {
 	s := InitTestServer()
 	s.bridge = &testBridge{poorContext: true}
-	s.moveLoop(context.Background())
+	s.moveLoop(context.Background(), -1)
 }
 
 func TestMoveFail(t *testing.T) {
 	s := InitTestServer()
 	s.bridge = &testBridge{failMove: true}
-	s.moveLoop(context.Background())
+	s.moveLoop(context.Background(), -1)
 }
 
 func TestPrintFail(t *testing.T) {
 	s := InitTestServer()
 	s.bridge = &testBridge{failPrint: true}
-	s.moveLoop(context.Background())
+	s.moveLoop(context.Background(), -1)
 
 }
 
 func TestResolveFail(t *testing.T) {
 	s := InitTestServer()
 	s.bridge = &testBridge{failResolve: true}
-	s.moveLoop(context.Background())
+	s.moveLoop(context.Background(), -1)
 
 }
 
 func TestClearFail(t *testing.T) {
 	s := InitTestServer()
 	s.bridge = &testBridge{failClear: true}
-	s.moveLoop(context.Background())
+	s.moveLoop(context.Background(), -1)
 }
 
 func TestLocationMove(t *testing.T) {
@@ -337,18 +338,12 @@ func TestLocationMove(t *testing.T) {
 
 func TestListeningPileMove(t *testing.T) {
 	s := InitTestServer()
-	res := s.move(context.Background(), &pbrm.RecordMove{BeforeContext: &pbrm.Context{Location: "same"}, AfterContext: &pbrm.Context{Location: "Listening Pile"}})
-	if res != nil {
-		t.Errorf("Bad move")
-	}
+	s.move(context.Background(), &pbrm.RecordMove{BeforeContext: &pbrm.Context{Location: "same"}, AfterContext: &pbrm.Context{Location: "Listening Pile"}})
 }
 
 func TestSekkMove(t *testing.T) {
 	s := InitTestServer()
-	res := s.move(context.Background(), &pbrm.RecordMove{BeforeContext: &pbrm.Context{Location: "same"}, AfterContext: &pbrm.Context{Location: "Sell"}})
-	if res != nil {
-		t.Errorf("Bad move")
-	}
+	s.move(context.Background(), &pbrm.RecordMove{BeforeContext: &pbrm.Context{Location: "same"}, AfterContext: &pbrm.Context{Location: "Sell"}})
 }
 
 func TestLocationMoveDiffTo(t *testing.T) {

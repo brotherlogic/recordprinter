@@ -9,14 +9,15 @@ import (
 	"time"
 
 	"github.com/brotherlogic/goserver"
+	"github.com/brotherlogic/goserver/utils"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
 	pbgd "github.com/brotherlogic/godiscogs"
 	pbg "github.com/brotherlogic/goserver/proto"
-	"github.com/brotherlogic/goserver/utils"
 	pbp "github.com/brotherlogic/printer/proto"
 	pbrc "github.com/brotherlogic/recordcollection/proto"
+	rcpb "github.com/brotherlogic/recordcollection/proto"
 	pbrm "github.com/brotherlogic/recordmover/proto"
 	pb "github.com/brotherlogic/recordprinter/proto"
 	pbro "github.com/brotherlogic/recordsorganiser/proto"
@@ -29,7 +30,7 @@ const (
 
 // Bridge link to other services
 type Bridge interface {
-	getMoves(ctx context.Context) ([]*pbrm.RecordMove, error)
+	getMoves(ctx context.Context, id int32) ([]*pbrm.RecordMove, error)
 	clearMove(ctx context.Context, move *pbrm.RecordMove) error
 	print(ctx context.Context, lines []string, move *pbrm.RecordMove, makeMove bool) error
 	resolve(ctx context.Context, move *pbrm.RecordMove) ([]string, error)
@@ -37,15 +38,15 @@ type Bridge interface {
 }
 
 type prodBridge struct {
-	dial       func(server string) (*grpc.ClientConn, error)
-	raiseIssue func(ctx context.Context, name string, body string, super bool)
+	dial       func(ctx context.Context, server string) (*grpc.ClientConn, error)
+	raiseIssue func(name string, body string)
 }
 
 func (p *prodBridge) getRecord(ctx context.Context, id int32) (*pbrc.Record, error) {
 	if id < -1 {
 		return &pbrc.Record{Release: &pbgd.Release{Title: "END OF SECTION"}}, nil
 	}
-	conn, err := p.dial("recordcollection")
+	conn, err := p.dial(ctx, "recordcollection")
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +61,7 @@ func (p *prodBridge) getRecord(ctx context.Context, id int32) (*pbrc.Record, err
 }
 
 func (p *prodBridge) getFolder(ctx context.Context, folderID int32) (string, error) {
-	conn, err := p.dial("recordsorganiser")
+	conn, err := p.dial(ctx, "recordsorganiser")
 	if err != nil {
 		return "", err
 	}
@@ -84,7 +85,7 @@ func (p *prodBridge) getReleaseString(ctx context.Context, instanceID int32) (st
 }
 
 func (p *prodBridge) getLocation(ctx context.Context, rec *pbrc.Record, folder string) ([]string, error) {
-	conn, err := p.dial("recordsorganiser")
+	conn, err := p.dial(ctx, "recordsorganiser")
 	if err != nil {
 		return []string{}, err
 	}
@@ -146,15 +147,15 @@ func (p *prodBridge) resolve(ctx context.Context, move *pbrm.RecordMove) ([]stri
 	return strret, nil
 }
 
-func (p *prodBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
-	conn, err := p.dial("recordmover")
+func (p *prodBridge) getMoves(ctx context.Context, id int32) ([]*pbrm.RecordMove, error) {
+	conn, err := p.dial(ctx, "recordmover")
 	if err != nil {
 		return nil, err
 	}
 	defer conn.Close()
 
 	client := pbrm.NewMoveServiceClient(conn)
-	resp, err := client.ListMoves(ctx, &pbrm.ListRequest{})
+	resp, err := client.ListMoves(ctx, &pbrm.ListRequest{InstanceId: id})
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +163,7 @@ func (p *prodBridge) getMoves(ctx context.Context) ([]*pbrm.RecordMove, error) {
 }
 
 func (p *prodBridge) clearMove(ctx context.Context, move *pbrm.RecordMove) error {
-	conn, err := p.dial("recordmover")
+	conn, err := p.dial(ctx, "recordmover")
 	if err != nil {
 		return err
 	}
@@ -181,11 +182,11 @@ func (p *prodBridge) print(ctx context.Context, lines []string, move *pbrm.Recor
 	}
 
 	if !makeMove {
-		p.raiseIssue(ctx, "Would print", superstring, false)
+		p.raiseIssue("Would print", superstring)
 		return fmt.Errorf("Failing")
 	}
 
-	conn, err := p.dial("printer")
+	conn, err := p.dial(ctx, "printer")
 	if err != nil {
 		return err
 	}
@@ -218,13 +219,13 @@ func Init() *Server {
 		"",
 		0,
 	}
-	s.bridge = &prodBridge{s.DialMaster, s.RaiseIssue}
+	s.bridge = &prodBridge{s.FDialServer, s.RaiseIssue}
 	return s
 }
 
 // DoRegister does RPC registration
 func (s *Server) DoRegister(server *grpc.Server) {
-	//Pass
+	rcpb.RegisterClientUpdateServiceServer(server, s)
 }
 
 // ReportHealth alerts if we're not healthy
@@ -291,7 +292,7 @@ func main() {
 	server.Register = server
 	server.RPCTracing = true
 
-	err := server.RegisterServerV2("recordprinter", false, false)
+	err := server.RegisterServerV2("recordprinter", false, true)
 	if err != nil {
 		return
 	}
@@ -304,8 +305,6 @@ func main() {
 		fmt.Printf("Initialised: %v\n", err)
 		return
 	}
-
-	server.RegisterRepeatingTask(server.moveLoop, "move_loop", time.Minute*30)
 
 	fmt.Printf("%v", server.Serve())
 }

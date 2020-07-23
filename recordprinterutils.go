@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"sort"
 	"time"
 
 	"golang.org/x/net/context"
@@ -10,31 +9,18 @@ import (
 	pbrm "github.com/brotherlogic/recordmover/proto"
 )
 
-func (s *Server) moveLoop(ctx context.Context) error {
-	s.count++
-	s.lastCount = time.Now()
-	moves, err := s.bridge.getMoves(ctx)
-
-	if err != nil {
-		s.lastIssue = fmt.Sprintf("%v", err)
-		return err
-	}
-
-	//Sort moves by date
-	sort.SliceStable(moves, func(i, j int) bool {
-		return moves[i].MoveDate < moves[j].MoveDate
-	})
-
-	s.Log(fmt.Sprintf("Processing %v moves", len(moves)))
-	for _, move := range moves {
-		err := s.move(ctx, move)
-		if err != nil {
-			return err
+func (s *Server) moveLoop(ctx context.Context, id int32) error {
+	moves, err := s.bridge.getMoves(ctx, id)
+	if err == nil {
+		for _, move := range moves {
+			err = s.move(ctx, move)
+			if err != nil {
+				break
+			}
 		}
 	}
 
-	s.lastIssue = "No issues"
-	return nil
+	return err
 }
 
 func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
@@ -47,7 +33,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 			if move.GetToFolder() == move.GetFromFolder() {
 				return nil
 			}
-			s.RaiseIssue(ctx, "Weird Move", fmt.Sprintf("%v is a weird move", move), false)
+			s.RaiseIssue("Weird Move", fmt.Sprintf("%v is a weird move", move))
 			return nil
 		}
 
@@ -68,7 +54,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 		if move.GetAfterContext().GetLocation() == "Listening Pile" {
 			surrounds = move.GetBeforeContext()
 			if surrounds.GetBeforeInstance() == 0 && surrounds.GetAfterInstance() == 0 {
-				s.RaiseIssue(ctx, "Weird Move", fmt.Sprintf("%v has not before context", move), false)
+				s.RaiseIssue("Weird Move", fmt.Sprintf("%v has not before context", move))
 				return nil
 			}
 		}
@@ -108,7 +94,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 
 		s.save(ctx)
 	} else {
-		s.RaiseIssue(ctx, "Record Print Issue", fmt.Sprintf("Move for %v is not able to be printed", move.GetInstanceId()), false)
+		s.RaiseIssue("Record Print Issue", fmt.Sprintf("Move for %v is not able to be printed", move.GetInstanceId()))
 	}
 
 	return nil
