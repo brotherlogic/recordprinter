@@ -6,6 +6,7 @@ import (
 
 	"golang.org/x/net/context"
 
+	pbrc "github.com/brotherlogic/recordcollection/proto"
 	pbrm "github.com/brotherlogic/recordmover/proto"
 )
 
@@ -21,6 +22,36 @@ func (s *Server) moveLoop(ctx context.Context, id int32) error {
 	}
 
 	return err
+}
+
+func (s *Server) buildMove(ctx context.Context, record *pbrc.Record, move *pbrm.RecordMove) []string {
+	lines := []string{}
+	surrounds := move.GetAfterContext()
+
+	// Don't show after context for sales
+	if move.GetAfterContext().GetLocation() == "Sell" {
+		surrounds = nil
+	}
+
+	// If we're moving into the LP, use the before context
+	if move.GetAfterContext().GetLocation() == "Listening Pile" {
+		surrounds = move.GetBeforeContext()
+	}
+
+	if surrounds != nil {
+		lines = append(lines, fmt.Sprintf("Slot %v", surrounds.GetSlot()))
+		if surrounds.GetBeforeInstance() != 0 {
+			bef, _ := s.bridge.getRecord(ctx, move.GetAfterContext().GetBeforeInstance())
+			lines = append(lines, fmt.Sprintf(" %v", bef.GetRelease().GetTitle()))
+		}
+		lines = append(lines, fmt.Sprintf(" %v", record.GetRelease().Title))
+		if move.GetAfterContext().GetAfterInstance() != 0 {
+			aft, _ := s.bridge.getRecord(ctx, move.GetAfterContext().GetAfterInstance())
+			lines = append(lines, fmt.Sprintf(" %v", aft.GetRelease().GetTitle()))
+		}
+	}
+
+	return lines
 }
 
 func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
@@ -59,23 +90,8 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 			}
 		}
 
-		// Don't show after context for sales
-		if move.GetAfterContext().GetLocation() == "Sell" {
-			surrounds = nil
-		}
-
-		if surrounds != nil {
-			lines = append(lines, fmt.Sprintf("Slot %v", surrounds.GetSlot()))
-			if surrounds.GetBeforeInstance() != 0 {
-				bef, _ := s.bridge.getRecord(ctx, move.GetAfterContext().GetBeforeInstance())
-				lines = append(lines, fmt.Sprintf(" %v", bef.GetRelease().GetTitle()))
-			}
-			lines = append(lines, fmt.Sprintf(" %v", record.GetRelease().Title))
-			if move.GetAfterContext().GetAfterInstance() != 0 {
-				aft, _ := s.bridge.getRecord(ctx, move.GetAfterContext().GetAfterInstance())
-				lines = append(lines, fmt.Sprintf(" %v", aft.GetRelease().GetTitle()))
-			}
-		}
+		addlines := s.buildMove(ctx, record, move)
+		lines = append(lines, addlines...)
 
 		// Don't print bandcamp moves, unless they're into digital
 		// Don't print moves to stale sales
