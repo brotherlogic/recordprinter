@@ -200,7 +200,6 @@ func (p *prodBridge) print(ctx context.Context, lines []string, move *pbrm.Recor
 //Server main server type
 type Server struct {
 	*goserver.GoServer
-	config    *pb.Config
 	bridge    Bridge
 	count     int64
 	lastCount time.Time
@@ -212,7 +211,6 @@ type Server struct {
 func Init() *Server {
 	s := &Server{
 		&goserver.GoServer{},
-		&pb.Config{},
 		&prodBridge{},
 		0,
 		time.Unix(0, 0),
@@ -238,43 +236,14 @@ func (s *Server) Shutdown(ctx context.Context) error {
 	return nil
 }
 
-func (s *Server) load(ctx context.Context) error {
-	config := &pb.Config{}
-	data, _, err := s.KSclient.Read(ctx, KEY, config)
-
-	if err != nil {
-		return err
-	}
-
-	s.config = data.(*pb.Config)
-	if s.config.LastPrint == 0 {
-		return fmt.Errorf("Unable to mote, dodgy data")
-	}
-	return nil
-}
-
-func (s *Server) save(ctx context.Context) {
-	s.KSclient.Save(ctx, KEY, s.config)
-}
-
 // Mote promotes/demotes this server
 func (s *Server) Mote(ctx context.Context, master bool) error {
-	if master {
-		return s.load(ctx)
-	}
-
 	return nil
 }
 
 // GetState gets the state of the server
 func (s *Server) GetState() []*pbg.State {
-	return []*pbg.State{
-		&pbg.State{Key: "last_time", TimeValue: s.config.LastPrint},
-		&pbg.State{Key: "curr_count", Value: s.count},
-		&pbg.State{Key: "last_count", Text: fmt.Sprintf("%v", s.lastCount)},
-		&pbg.State{Key: "error", Text: s.lastIssue},
-		&pbg.State{Key: "curr_print_move", Value: int64(s.currMove)},
-	}
+	return []*pbg.State{}
 }
 
 func main() {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/brotherlogic/keystore/client"
+	keystoreclient "github.com/brotherlogic/keystore/client"
 	"golang.org/x/net/context"
 
 	pbgd "github.com/brotherlogic/godiscogs"
@@ -301,7 +301,7 @@ func TestMovePoor(t *testing.T) {
 func TestMovePoorContext(t *testing.T) {
 	s := InitTestServer()
 	s.bridge = &testBridge{poorContext: true}
-	s.moveLoop(context.Background(), -1)
+	s.ClientUpdate(context.Background(), &pbrc.ClientUpdateRequest{InstanceId: -1})
 }
 
 func TestMoveFail(t *testing.T) {
@@ -338,7 +338,18 @@ func TestLocationMove(t *testing.T) {
 
 func TestListeningPileMove(t *testing.T) {
 	s := InitTestServer()
-	s.move(context.Background(), &pbrm.RecordMove{BeforeContext: &pbrm.Context{Location: "same"}, AfterContext: &pbrm.Context{Location: "Listening Pile"}})
+	err := s.move(context.Background(), &pbrm.RecordMove{BeforeContext: &pbrm.Context{Location: "same", BeforeInstance: int32(123), AfterInstance: int32(124)}, AfterContext: &pbrm.Context{Location: "Listening Pile"}})
+	if err != nil {
+		t.Errorf("Bad listening pile move: %v", err)
+	}
+}
+
+func TestListeningPileMoveGoneWrong(t *testing.T) {
+	s := InitTestServer()
+	err := s.move(context.Background(), &pbrm.RecordMove{BeforeContext: &pbrm.Context{Location: "same"}, AfterContext: &pbrm.Context{Location: "Listening Pile"}})
+	if err != nil {
+		t.Errorf("Bad listening pile move: %v", err)
+	}
 }
 
 func TestSekkMove(t *testing.T) {

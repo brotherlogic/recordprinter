@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"time"
 
 	"golang.org/x/net/context"
 
@@ -97,7 +96,6 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 		// Don't print moves to stale sales
 		if record.GetMetadata().GetGoalFolder() != 1782105 && move.GetToFolder() != 268147 && move.GetToFolder() != 1708299 {
 			err = s.bridge.print(ctx, lines, move, true)
-			s.config.LastPrint = time.Now().Unix()
 			if err != nil {
 				return err
 			}
@@ -107,8 +105,6 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 		if err != nil {
 			return err
 		}
-
-		s.save(ctx)
 	} else {
 		s.RaiseIssue("Record Print Issue", fmt.Sprintf("Move for %v is not able to be printed", move.GetInstanceId()))
 	}
