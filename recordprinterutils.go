@@ -28,7 +28,7 @@ func (s *Server) buildMove(ctx context.Context, record *pbrc.Record, move *pbrm.
 	surrounds := move.GetAfterContext()
 
 	// Don't show after context for sales
-	if move.GetAfterContext().GetLocation() == "Sell" {
+	if move.GetAfterContext().GetLocation() == "Sell" || move.GetAfterContext().GetLocation() == "Sold" {
 		surrounds = nil
 	}
 
