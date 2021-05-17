@@ -95,7 +95,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 		// Don't print bandcamp moves, unless they're into digital
 		// Don't print moves to stale sales
 		// Don't print 12 inch moves (handled by STO)
-		if record.GetMetadata().GetGoalFolder() != 1782105 && move.GetToFolder() != 268147 && move.GetToFolder() != 1708299 && move.GetToFolder() != 242017 {
+		if record.GetMetadata().GetGoalFolder() != 1782105 && record.GetMetadata().GetGoalFolder() != 2274270 && move.GetToFolder() != 268147 && move.GetToFolder() != 1708299 && move.GetToFolder() != 242017 {
 			err = s.bridge.print(ctx, lines, move, true)
 			if err != nil {
 				return err
