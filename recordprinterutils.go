@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"golang.org/x/net/context"
 
@@ -103,7 +104,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 			move.GetToFolder() != 242017 &&
 			move.GetAfterContext().GetLocation() != "Library Records" &&
 			move.GetAfterContext().GetLocation() != "Keepers" &&
-			move.GetAfterContext().GetLocation() != "Boxed" {
+			!strings.Contains(move.GetAfterContext().GetLocation(), "Boxed") {
 			err = s.bridge.print(ctx, lines, move, true)
 			if err != nil {
 				return err
