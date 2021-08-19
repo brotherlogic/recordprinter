@@ -101,9 +101,6 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 			record.GetMetadata().GetGoalFolder() != 2274270 &&
 			move.GetToFolder() != 268147 &&
 			move.GetToFolder() != 1708299 &&
-			move.GetToFolder() != 242017 &&
-			move.GetAfterContext().GetLocation() != "Library Records" &&
-			move.GetAfterContext().GetLocation() != "Keepers" &&
 			!strings.Contains(move.GetAfterContext().GetLocation(), "Boxed") {
 			err = s.bridge.print(ctx, lines, move, true)
 			if err != nil {
