@@ -113,7 +113,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 			return err
 		}
 	} else {
-		s.RaiseIssue("Record Print Issue", fmt.Sprintf("Move for %v is not able to be printed", move.GetInstanceId()))
+		s.RaiseIssue("Record Print Issue", fmt.Sprintf("Move for %v is not able to be printed -> %v", move.GetInstanceId(), move))
 	}
 
 	return nil
