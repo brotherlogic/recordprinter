@@ -79,17 +79,6 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 		}
 		lines := []string{fmt.Sprintf("%v - %v: %v -> %v\n", artistName, record.GetRelease().Title, move.GetBeforeContext().GetLocation(), move.GetAfterContext().GetLocation())}
 
-		// Also add in the after surrounds
-		surrounds := move.GetAfterContext()
-
-		if move.GetAfterContext().GetLocation() == "Listening Pile" {
-			surrounds = move.GetBeforeContext()
-			if surrounds.GetBeforeInstance() == 0 && surrounds.GetAfterInstance() == 0 {
-				s.RaiseIssue("Weird Move", fmt.Sprintf("%v has not before context", move))
-				return nil
-			}
-		}
-
 		addlines := s.buildMove(ctx, record, move)
 		lines = append(lines, addlines...)
 
