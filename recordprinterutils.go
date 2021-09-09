@@ -92,9 +92,15 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 			move.GetToFolder() != 1708299 &&
 			!strings.Contains(move.GetAfterContext().GetLocation(), "Boxed") &&
 			!strings.Contains(move.GetAfterContext().GetLocation(), "Cleaning") {
-			err = s.bridge.print(ctx, lines, move, true)
-			if err != nil {
-				return err
+
+			cleanToListen := strings.Contains(move.GetAfterContext().GetLocation(), "Listening") &&
+				strings.Contains(move.GetBeforeContext().GetLocation(), "Listening")
+
+			if !cleanToListen {
+				err = s.bridge.print(ctx, lines, move, true)
+				if err != nil {
+					return err
+				}
 			}
 		}
 
