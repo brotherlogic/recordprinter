@@ -42,12 +42,12 @@ func (s *Server) buildMove(ctx context.Context, record *pbrc.Record, move *pbrm.
 	if surrounds != nil {
 		lines = append(lines, fmt.Sprintf("Slot %v", surrounds.GetSlot()))
 		if surrounds.GetBeforeInstance() != 0 {
-			bef, _ := s.bridge.getRecord(ctx, move.GetAfterContext().GetBeforeInstance())
+			bef, _ := s.bridge.getRecord(ctx, surrounds.GetBeforeInstance())
 			lines = append(lines, fmt.Sprintf(" %v", bef.GetRelease().GetTitle()))
 		}
 		lines = append(lines, fmt.Sprintf(" %v", record.GetRelease().Title))
 		if move.GetAfterContext().GetAfterInstance() != 0 {
-			aft, _ := s.bridge.getRecord(ctx, move.GetAfterContext().GetAfterInstance())
+			aft, _ := s.bridge.getRecord(ctx, surrounds.GetAfterInstance())
 			lines = append(lines, fmt.Sprintf(" %v", aft.GetRelease().GetTitle()))
 		}
 	}
