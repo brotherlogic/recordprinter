@@ -92,7 +92,8 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 			move.GetToFolder() != 268147 &&
 			move.GetToFolder() != 1708299 &&
 			!strings.Contains(move.GetAfterContext().GetLocation(), "Boxed") &&
-			!strings.Contains(move.GetAfterContext().GetLocation(), "Cleaning") {
+			!strings.Contains(move.GetAfterContext().GetLocation(), "Cleaning") &&
+			!strings.Contains(move.GetBeforeContext().GetLocation(), "Limbo") {
 
 			cleanToListen := strings.Contains(move.GetAfterContext().GetLocation(), "Listening") &&
 				strings.Contains(move.GetBeforeContext().GetLocation(), "Cleaning")
