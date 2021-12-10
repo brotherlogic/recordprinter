@@ -99,8 +99,8 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 				strings.Contains(move.GetBeforeContext().GetLocation(), "Cleaning")
 			boxToPile := strings.Contains(move.GetAfterContext().GetLocation(), "Listening") &&
 				strings.Contains(move.GetBeforeContext().GetLocation(), "Listening")
-			intoHolding := strings.Contains(move.GetAfterContext().GetLocation(), "Holding") &&
-				strings.Contains(move.GetBeforeContext().GetLocation(), "Listening")
+			intoHolding := strings.Contains(move.GetAfterContext().GetLocation(), "Holding") ||
+				strings.Contains(move.GetBeforeContext().GetLocation(), "Holding")
 
 			if !cleanToListen && !boxToPile && !intoHolding {
 				err = s.bridge.print(ctx, lines, move, true)
