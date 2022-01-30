@@ -12,6 +12,7 @@ import (
 
 func (s *Server) moveLoop(ctx context.Context, id int32) error {
 	moves, err := s.bridge.getMoves(ctx, id)
+	s.CtxLog(ctx, fmt.Sprintf("Got %v moves for %v", len(moves), id))
 	if err == nil {
 		for _, move := range moves {
 			err = s.move(ctx, move)
@@ -108,6 +109,8 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 					return err
 				}
 			}
+		} else {
+			s.CtxLog(ctx, fmt.Sprintf("move for %v did not pass", record.GetRelease().GetInstanceId()))
 		}
 
 		err = s.bridge.clearMove(ctx, move)
