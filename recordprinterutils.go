@@ -75,6 +75,11 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 			return err
 		}
 
+		// Don't print validate moves into the listening pile
+		if move.GetAfterContext().GetLocation() == "Listening Pile" && record.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_PRE_VALIDATE {
+			return nil
+		}
+
 		artistName := "Unknown Artist"
 		if len(record.GetRelease().GetArtists()) > 0 {
 			artistName = record.GetRelease().GetArtists()[0].GetName()
