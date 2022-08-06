@@ -75,7 +75,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 			return err
 		}
 
-		s.CtxLog(ctx, fmt.Sprintf("Moving %v -> %v", record, move))
+		s.CtxLog(ctx, fmt.Sprintf("Moving %v -> %v", move.GetAfterContext().GetLocation(), record.GetMetadata().GetCategory()))
 		// Don't print validate moves into the listening pile
 		if move.GetAfterContext().GetLocation() == "Listening Pile" &&
 			record.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_PRE_VALIDATE {
