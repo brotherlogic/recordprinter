@@ -75,11 +75,13 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 			return err
 		}
 
+		pmove := true
+
 		s.CtxLog(ctx, fmt.Sprintf("Moving %v -> %v", move.GetAfterContext().GetLocation(), record.GetMetadata().GetCategory()))
 		// Don't print validate moves into the listening pile
 		if move.GetAfterContext().GetLocation() == "Listening Pile" &&
 			record.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_PRE_VALIDATE {
-			return nil
+			pmove = false
 		}
 
 		artistName := "Unknown Artist"
@@ -95,29 +97,31 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 		// Don't print moves to stale sales
 		// Don't print 12 inch moves (handled by STO)
 		// Don't print moves into library records
-		if record.GetMetadata().GetGoalFolder() != 1782105 &&
-			record.GetMetadata().GetGoalFolder() != 2274270 &&
-			move.GetToFolder() != 268147 &&
-			move.GetToFolder() != 1708299 &&
-			!strings.Contains(move.GetAfterContext().GetLocation(), "Boxed") &&
-			!strings.Contains(move.GetAfterContext().GetLocation(), "Cleaning") &&
-			!strings.Contains(move.GetBeforeContext().GetLocation(), "Limbo") {
+		if pmove {
+			if record.GetMetadata().GetGoalFolder() != 1782105 &&
+				record.GetMetadata().GetGoalFolder() != 2274270 &&
+				move.GetToFolder() != 268147 &&
+				move.GetToFolder() != 1708299 &&
+				!strings.Contains(move.GetAfterContext().GetLocation(), "Boxed") &&
+				!strings.Contains(move.GetAfterContext().GetLocation(), "Cleaning") &&
+				!strings.Contains(move.GetBeforeContext().GetLocation(), "Limbo") {
 
-			cleanToListen := strings.Contains(move.GetAfterContext().GetLocation(), "Listening") &&
-				strings.Contains(move.GetBeforeContext().GetLocation(), "Cleaning")
-			boxToPile := strings.Contains(move.GetAfterContext().GetLocation(), "Listening") &&
-				strings.Contains(move.GetBeforeContext().GetLocation(), "Listening")
-			intoHolding := strings.Contains(move.GetAfterContext().GetLocation(), "Holding") ||
-				strings.Contains(move.GetBeforeContext().GetLocation(), "Holding")
+				cleanToListen := strings.Contains(move.GetAfterContext().GetLocation(), "Listening") &&
+					strings.Contains(move.GetBeforeContext().GetLocation(), "Cleaning")
+				boxToPile := strings.Contains(move.GetAfterContext().GetLocation(), "Listening") &&
+					strings.Contains(move.GetBeforeContext().GetLocation(), "Listening")
+				intoHolding := strings.Contains(move.GetAfterContext().GetLocation(), "Holding") ||
+					strings.Contains(move.GetBeforeContext().GetLocation(), "Holding")
 
-			if !cleanToListen && !boxToPile && !intoHolding {
-				err = s.bridge.print(ctx, lines, move, true)
-				if err != nil {
-					return err
+				if !cleanToListen && !boxToPile && !intoHolding {
+					err = s.bridge.print(ctx, lines, move, true)
+					if err != nil {
+						return err
+					}
 				}
+			} else {
+				s.CtxLog(ctx, fmt.Sprintf("move for %v did not pass", record.GetRelease().GetInstanceId()))
 			}
-		} else {
-			s.CtxLog(ctx, fmt.Sprintf("move for %v did not pass", record.GetRelease().GetInstanceId()))
 		}
 
 		err = s.bridge.clearMove(ctx, move)
