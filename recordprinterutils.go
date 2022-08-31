@@ -66,7 +66,6 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 			if move.GetToFolder() == move.GetFromFolder() {
 				return nil
 			}
-			s.RaiseIssue("Weird Move", fmt.Sprintf("%v is a weird move", move))
 			return nil
 		}
 
