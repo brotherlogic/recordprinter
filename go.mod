@@ -3,15 +3,19 @@ module github.com/brotherlogic/recordprinter
 go 1.16
 
 require (
-	github.com/brotherlogic/godiscogs v0.0.0-20220903154230-c90014325c5b
-	github.com/brotherlogic/goserver v0.0.0-20220930143508-9c9ff6258bec
-	github.com/brotherlogic/keystore v0.0.0-20220919100110-299b209de552
-	github.com/brotherlogic/printer v0.0.0-20220920142321-fb7676dda1f4
-	github.com/brotherlogic/recordcollection v0.0.0-20221003223343-426438865f7c
-	github.com/brotherlogic/recordmover v0.0.0-20220916155657-57085f5f0ae3
-	github.com/brotherlogic/recordsorganiser v0.0.0-20220918144231-752c65efd7d9
+	github.com/brotherlogic/discovery v0.0.0-20221102131626-ad0701835a27 // indirect
+	github.com/brotherlogic/dstore v0.0.0-20221102144812-76282d61ef80 // indirect
+	github.com/brotherlogic/gobuildslave v0.0.0-20221102013257-50e8875754ff // indirect
+	github.com/brotherlogic/godiscogs v0.0.0-20221025153630-9ad31d9fab21
+	github.com/brotherlogic/goserver v0.0.0-20221102131541-bf4c88fab49f
+	github.com/brotherlogic/keystore v0.0.0-20221031212034-42f2c05dff54
+	github.com/brotherlogic/printer v0.0.0-20221031212111-e4f2176295cf
+	github.com/brotherlogic/recordcollection v0.0.0-20221101233458-014e7b183c15
+	github.com/brotherlogic/recordmover v0.0.0-20221016161752-e18a92d54ed6
+	github.com/brotherlogic/recordsorganiser v0.0.0-20221026135539-df354dce389c
 	github.com/golang/protobuf v1.5.2
-	golang.org/x/net v0.0.0-20221002022538-bcab6841153b
-	google.golang.org/grpc v1.49.0
+	github.com/prometheus/client_golang v1.13.1 // indirect
+	golang.org/x/net v0.1.0
+	google.golang.org/grpc v1.50.1
 	google.golang.org/protobuf v1.28.1
 )
