@@ -3,7 +3,7 @@ module github.com/brotherlogic/recordprinter
 go 1.16
 
 require (
-	github.com/brotherlogic/githubcard v0.0.0-20221130074843-8ccbe0f16c3a // indirect
+	github.com/brotherlogic/dstore v0.0.0-20221130075757-5ce1db3ff65c // indirect
 	github.com/brotherlogic/godiscogs v0.0.0-20221025153630-9ad31d9fab21
 	github.com/brotherlogic/goserver v0.0.0-20221106165541-0672428e3628
 	github.com/brotherlogic/keystore v0.0.0-20221129112009-b4e94692d1d0
