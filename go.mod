@@ -9,7 +9,7 @@ require (
 	github.com/brotherlogic/printer v0.0.0-20221225010900-398b42f67b7c
 	github.com/brotherlogic/recordcollection v0.0.0-20221225041339-2d464dcf060c
 	github.com/brotherlogic/recordmover v0.0.0-20221218051740-f4156cc0e0d9
-	github.com/brotherlogic/recordsorganiser v0.0.0-20221225040441-6958e24d6f4f
+	github.com/brotherlogic/recordsorganiser v0.0.0-20221225042505-8bd370788aa9
 	github.com/golang/protobuf v1.5.2
 	golang.org/x/net v0.4.0
 	google.golang.org/grpc v1.51.0
