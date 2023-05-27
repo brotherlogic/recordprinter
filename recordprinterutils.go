@@ -77,6 +77,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 		pmove := true
 
 		s.CtxLog(ctx, fmt.Sprintf("Moving %v -> %v", move.GetAfterContext().GetLocation(), record.GetMetadata().GetCategory()))
+
 		// Don't print validate moves into the listening pile
 		if move.GetAfterContext().GetLocation() == "Listening Pile" &&
 			record.GetMetadata().GetCategory() == pbrc.ReleaseMetadata_PRE_VALIDATE {
@@ -94,7 +95,6 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 
 		// Don't print bandcamp moves, unless they're into digital
 		// Don't print moves to stale sales
-		// Don't print 12 inch moves (handled by STO)
 		// Don't print moves into library records
 		if pmove {
 			if record.GetMetadata().GetGoalFolder() != 1782105 &&
