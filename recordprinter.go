@@ -13,9 +13,11 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
+	pqc "github.com/brotherlogic/printqueue/client"
+
 	pbgd "github.com/brotherlogic/godiscogs/proto"
 	pbg "github.com/brotherlogic/goserver/proto"
-	pbp "github.com/brotherlogic/printer/proto"
+	pqcpb "github.com/brotherlogic/printqueue/proto"
 	pbrc "github.com/brotherlogic/recordcollection/proto"
 	rcpb "github.com/brotherlogic/recordcollection/proto"
 	pbrm "github.com/brotherlogic/recordmover/proto"
@@ -40,6 +42,7 @@ type Bridge interface {
 type prodBridge struct {
 	dial       func(ctx context.Context, server string) (*grpc.ClientConn, error)
 	raiseIssue func(name string, body string)
+	pqc        *pqc.PrintQueueClient
 }
 
 func (p *prodBridge) getRecord(ctx context.Context, id int32) (*pbrc.Record, error) {
@@ -185,15 +188,7 @@ func (p *prodBridge) print(ctx context.Context, lines []string, move *pbrm.Recor
 		p.raiseIssue("Would print", superstring)
 		return fmt.Errorf("Failing")
 	}
-
-	conn, err := p.dial(ctx, "printer")
-	if err != nil {
-		return err
-	}
-	defer conn.Close()
-
-	client := pbp.NewPrintServiceClient(conn)
-	_, err = client.Print(ctx, &pbp.PrintRequest{Lines: lines, Origin: "recordprinter"})
+	_, err := p.pqc.Print(ctx, &pqcpb.PrintRequest{Lines: lines, Origin: "recordprinter"})
 	return err
 }
 
@@ -205,10 +200,19 @@ type Server struct {
 	lastCount time.Time
 	lastIssue string
 	currMove  int32
+	pqc       *pqc.PrintQueueClient
 }
 
 // Init builds the server
 func Init() *Server {
+	ctx, cancel := utils.ManualContext("rpinit", time.Minute)
+	defer cancel()
+
+	cl, err := pqc.NewPrintQueueClient(ctx)
+	if err != nil {
+		panic(err)
+	}
+
 	s := &Server{
 		&goserver.GoServer{},
 		&prodBridge{},
@@ -216,8 +220,9 @@ func Init() *Server {
 		time.Unix(0, 0),
 		"",
 		0,
+		cl,
 	}
-	s.bridge = &prodBridge{s.FDialServer, s.RaiseIssue}
+	s.bridge = &prodBridge{s.FDialServer, s.RaiseIssue, s.pqc}
 	return s
 }
 
