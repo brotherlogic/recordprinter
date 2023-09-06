@@ -71,7 +71,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 
 		record, err := s.bridge.getRecord(ctx, move.InstanceId)
 		if err != nil {
-			return err
+			return fmt.Errorf("unable to get record: %w", err)
 		}
 
 		pmove := true
@@ -109,7 +109,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 				if !cleanToListen && !boxToPile && !intoHolding {
 					err = s.bridge.print(ctx, lines, move, true)
 					if err != nil {
-						return err
+						return fmt.Errorf("unable to print: %w", err)
 					}
 				}
 			} else {
@@ -119,7 +119,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 
 		err = s.bridge.clearMove(ctx, move)
 		if err != nil {
-			return err
+			return fmt.Errorf("unable to clear move: %w", err)
 		}
 	} else {
 		s.RaiseIssue("Record Print Issue", fmt.Sprintf("Move for %v is not able to be printed -> %v", move.GetInstanceId(), move))

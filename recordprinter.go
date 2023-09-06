@@ -51,14 +51,14 @@ func (p *prodBridge) getRecord(ctx context.Context, id int32) (*pbrc.Record, err
 	}
 	conn, err := p.dial(ctx, "recordcollection")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to dial rc: %w", err)
 	}
 	defer conn.Close()
 
 	client := pbrc.NewRecordCollectionServiceClient(conn)
 	rel, err := client.GetRecord(ctx, &pbrc.GetRecordRequest{InstanceId: id})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to get record: %w", err)
 	}
 	return rel.GetRecord(), err
 }
@@ -66,14 +66,14 @@ func (p *prodBridge) getRecord(ctx context.Context, id int32) (*pbrc.Record, err
 func (p *prodBridge) getFolder(ctx context.Context, folderID int32) (string, error) {
 	conn, err := p.dial(ctx, "recordsorganiser")
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("unable to dial ro: %w", err)
 	}
 	defer conn.Close()
 
 	client := pbro.NewOrganiserServiceClient(conn)
 	r, err := client.GetQuota(ctx, &pbro.QuotaRequest{FolderId: folderID})
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("unable to get quote: %w", err)
 	}
 
 	return r.LocationName, nil
@@ -82,7 +82,7 @@ func (p *prodBridge) getFolder(ctx context.Context, folderID int32) (string, err
 func (p *prodBridge) getReleaseString(ctx context.Context, instanceID int32) (string, error) {
 	rel, err := p.getRecord(ctx, instanceID)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("unable to get record: %w", err)
 	}
 	return rel.GetRelease().Title + " [" + strconv.Itoa(int(instanceID)) + "]", nil
 }
@@ -90,7 +90,7 @@ func (p *prodBridge) getReleaseString(ctx context.Context, instanceID int32) (st
 func (p *prodBridge) getLocation(ctx context.Context, rec *pbrc.Record, folder string) ([]string, error) {
 	conn, err := p.dial(ctx, "recordsorganiser")
 	if err != nil {
-		return []string{}, err
+		return []string{}, fmt.Errorf("unable to dial ro: %w", err)
 	}
 	defer conn.Close()
 
@@ -106,19 +106,19 @@ func (p *prodBridge) getLocation(ctx context.Context, rec *pbrc.Record, folder s
 			if i > 0 {
 				rString, err := p.getReleaseString(ctx, location.GetFoundLocation().GetReleasesLocation()[i-1].InstanceId)
 				if err != nil {
-					return []string{}, err
+					return []string{}, fmt.Errorf("unable to resolve release string: %w", err)
 				}
 				str = append(str, fmt.Sprintf("  %v. %v\n", i-1, rString))
 			}
 			rString, err := p.getReleaseString(ctx, location.GetFoundLocation().GetReleasesLocation()[i].InstanceId)
 			if err != nil {
-				return []string{}, err
+				return []string{}, fmt.Errorf("unable to resolve release string: %w", err)
 			}
 			str = append(str, fmt.Sprintf("  %v. %v\n", i, rString))
 			if i < len(location.GetFoundLocation().GetReleasesLocation())-1 {
 				rString, err := p.getReleaseString(ctx, location.GetFoundLocation().GetReleasesLocation()[i+1].InstanceId)
 				if err != nil {
-					return []string{}, err
+					return []string{}, fmt.Errorf("unable to resolve release string: %w", err)
 				}
 				str = append(str, fmt.Sprintf("  %v. %v\n", i+1, rString))
 			}
@@ -130,17 +130,17 @@ func (p *prodBridge) getLocation(ctx context.Context, rec *pbrc.Record, folder s
 func (p *prodBridge) resolve(ctx context.Context, move *pbrm.RecordMove) ([]string, error) {
 	f1, err := p.getFolder(ctx, move.FromFolder)
 	if err != nil {
-		return []string{}, err
+		return []string{}, fmt.Errorf("unable to get folder: %w", err)
 	}
 
 	f2, err := p.getFolder(ctx, move.ToFolder)
 	if err != nil {
-		return []string{}, err
+		return []string{}, fmt.Errorf("unable to get folder: %w", err)
 	}
 
 	loc, err := p.getLocation(ctx, move.Record, f2)
 	if err != nil {
-		return []string{}, err
+		return []string{}, fmt.Errorf("unable to get location: %w", err)
 	}
 
 	strret := []string{fmt.Sprintf("%v: %v -> %v\n", move.Record.GetRelease().Title, f1, f2)}
@@ -153,14 +153,14 @@ func (p *prodBridge) resolve(ctx context.Context, move *pbrm.RecordMove) ([]stri
 func (p *prodBridge) getMoves(ctx context.Context, id int32) ([]*pbrm.RecordMove, error) {
 	conn, err := p.dial(ctx, "recordmover")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to dial mover: %w", err)
 	}
 	defer conn.Close()
 
 	client := pbrm.NewMoveServiceClient(conn)
 	resp, err := client.ListMoves(ctx, &pbrm.ListRequest{InstanceId: id})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("unable to list moves: %w", err)
 	}
 	return resp.Moves, err
 }
@@ -168,7 +168,7 @@ func (p *prodBridge) getMoves(ctx context.Context, id int32) ([]*pbrm.RecordMove
 func (p *prodBridge) clearMove(ctx context.Context, move *pbrm.RecordMove) error {
 	conn, err := p.dial(ctx, "recordmover")
 	if err != nil {
-		return err
+		return fmt.Errorf("Unable to dial mover %w", err)
 	}
 	defer conn.Close()
 
@@ -189,10 +189,13 @@ func (p *prodBridge) print(ctx context.Context, lines []string, move *pbrm.Recor
 		return fmt.Errorf("Failing")
 	}
 	_, err := p.pqc.Print(ctx, &pqcpb.PrintRequest{Lines: lines, Origin: "recordprinter"})
+	if err != nil {
+		return fmt.Errorf("unable to print: %w", err)
+	}
 	return err
 }
 
-//Server main server type
+// Server main server type
 type Server struct {
 	*goserver.GoServer
 	bridge    Bridge
