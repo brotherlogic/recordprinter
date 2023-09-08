@@ -189,7 +189,7 @@ func (p *prodBridge) print(ctx context.Context, lines []string, move *pbrm.Recor
 		return fmt.Errorf("Failing")
 	}
 
-	_, err := p.pqc.Print(ctx, &pqcpb.PrintRequest{Lines: lines, Origin: "recordprinter"})
+	_, err := p.pqc.Print(ctx, &pqcpb.PrintRequest{Lines: lines, Origin: "recordprinter", Destination: pqcpb.Destination_DESTINATION_RECEIPT})
 	if err != nil {
 		return fmt.Errorf("unable to print: %w", err)
 	}
