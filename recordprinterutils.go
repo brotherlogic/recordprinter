@@ -108,6 +108,7 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 
 				if !cleanToListen && !boxToPile && !intoHolding {
 					err = s.bridge.print(ctx, lines, move, true)
+					s.CtxLog(ctx, fmt.Sprintf("Printed %v -> %v", lines, err))
 					if err != nil {
 						return fmt.Errorf("unable to print: %w", err)
 					}
