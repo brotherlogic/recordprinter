@@ -1210,8 +1210,9 @@ github.com/brotherlogic/datastore v0.0.0-20230908222740-5851af593d72/go.mod h1:Y
 github.com/brotherlogic/datastore v0.0.0-20230915225331-470b7ec03f38/go.mod h1:TnIj56OPpva75Pn4JWUI9GNBRZ+24oTsCksfLpIYy0k=
 github.com/brotherlogic/datastore v0.0.0-20230923000359-d128ea1b371f/go.mod h1:a9GUsSF932UCQ8OKH1jq/Nh4OF0oJHhGkLXcgpkkIqw=
 github.com/brotherlogic/datastore v0.0.0-20230930023218-f35afe14c4eb/go.mod h1:CJjkC1LShodSP6yIccEL0Gv45YZlcr3wPEMNlZHzyKA=
-github.com/brotherlogic/datastore v0.0.0-20231020043628-33236fdced2d h1:MrsKnS9sgHhgCWQ22+pDunO/UPo0YcUxaSG38o7o+FU=
 github.com/brotherlogic/datastore v0.0.0-20231020043628-33236fdced2d/go.mod h1:uAcUWT7Sl0zqGUQlaTWP64kW1sKsG4ODM/Je2BBHtEk=
+github.com/brotherlogic/datastore v0.0.0-20231020051146-d7434e7d6636 h1:me9UdkQZjXAKZedki0dEQcsa8Pg3nF0czak72SgysCo=
+github.com/brotherlogic/datastore v0.0.0-20231020051146-d7434e7d6636/go.mod h1:t2ydEmBfF5YzEZGns69KiY+Iy0kWRgLOQXerGCvP4gM=
 github.com/brotherlogic/discovery v0.0.0-20200925011539-74a8dc203ba4/go.mod h1:W9XhDhsvBgeIgnOKgcWmtFilO549fuIhRMlVHiXAC9k=
 github.com/brotherlogic/discovery v0.0.0-20210531005423-1d609c4f6278/go.mod h1:W9XhDhsvBgeIgnOKgcWmtFilO549fuIhRMlVHiXAC9k=
 github.com/brotherlogic/discovery v0.0.0-20210603130245-be477d62024e/go.mod h1:W9XhDhsvBgeIgnOKgcWmtFilO549fuIhRMlVHiXAC9k=
@@ -1348,8 +1349,10 @@ github.com/brotherlogic/discovery v0.0.0-20230923220958-97b28e0a236a/go.mod h1:V
 github.com/brotherlogic/discovery v0.0.0-20231002182115-32762136810d/go.mod h1:5zqFlSm0y+OQaG+rvU6HyTwBHgMl49cJBryzM4EEgME=
 github.com/brotherlogic/discovery v0.0.0-20231011232119-d8a0e71101d7/go.mod h1:aYWsxUctrViCQZvUl9EYTNF/tIkhXUHZ2pX1Pwznm4w=
 github.com/brotherlogic/discovery v0.0.0-20231019043330-e664fbb1036e/go.mod h1:JqwKI2bAUDs0wiltOH2FX6KJtgvLkj5JsSRTQRlxodc=
-github.com/brotherlogic/discovery v0.0.0-20231020035437-aecf5e943b36 h1:+gx9dvLOvfv4Ros7j+/e7HbX2hO32wHkXX0yufQjKis=
 github.com/brotherlogic/discovery v0.0.0-20231020035437-aecf5e943b36/go.mod h1:JqwKI2bAUDs0wiltOH2FX6KJtgvLkj5JsSRTQRlxodc=
+github.com/brotherlogic/discovery v0.0.0-20231020050942-159586f3e082/go.mod h1:JqwKI2bAUDs0wiltOH2FX6KJtgvLkj5JsSRTQRlxodc=
+github.com/brotherlogic/discovery v0.0.0-20231020051243-2e0cbe163232 h1:q1if9Hb14IVwaRRZdEH9DZyie6TtWrq6klnhPvgWL0c=
+github.com/brotherlogic/discovery v0.0.0-20231020051243-2e0cbe163232/go.mod h1:JqwKI2bAUDs0wiltOH2FX6KJtgvLkj5JsSRTQRlxodc=
 github.com/brotherlogic/dstore v0.0.0-20210705011309-803d7db560a6/go.mod h1:SJdI/5dxubp66yy6slmUfen5yCIKXFvAmMs71u9xVrk=
 github.com/brotherlogic/dstore v0.0.0-20210728181450-e87a34c62535/go.mod h1:bwiN0EPWhmDNwue1BWpCQ7DL4hLwfDwDw8JwMMgDzCs=
 github.com/brotherlogic/dstore v0.0.0-20210911232556-7a6844e1f86f/go.mod h1:Wilk+LrYLvE5+fNDXp0dYQNTMxhb6rmkwv5GwZ/K3ok=
@@ -3501,8 +3504,8 @@ github.com/brotherlogic/recordsorganiser v0.0.0-20230911060858-b9f2e6918f07/go.m
 github.com/brotherlogic/recordsorganiser v0.0.0-20230918061740-b388a4f9c266/go.mod h1:Gx+sjYBRy6yOK26dtkY+SrXxFtIANK0ueTXO3resh20=
 github.com/brotherlogic/recordsorganiser v0.0.0-20230925205241-5e196767863e/go.mod h1:GfA/cra+CF84OYjVdw3TWcRTC1kxDGaZcmk/K+sO+qQ=
 github.com/brotherlogic/recordsorganiser v0.0.0-20231011232053-98052241f97c/go.mod h1:2BuGehB81P1XtbREWKuIWL9ju9t0cTogne7Rivz3a2g=
-github.com/brotherlogic/recordsorganiser v0.0.0-20231020041801-05c30b41f498 h1:QIIaa9GXAWLEMRrt2dU1Kp3lEzIzkn5BO43tuQaF/Dc=
-github.com/brotherlogic/recordsorganiser v0.0.0-20231020041801-05c30b41f498/go.mod h1:MEob6ZfVkuS2LjVI45afkGV+9LGVJhY7/xjaIElGq0M=
+github.com/brotherlogic/recordsorganiser v0.0.0-20231020050744-8a355559b55a h1:UJOz2bu2MnJCM/m9kHu13S6GcgPdmCLFqdz1myTPlPI=
+github.com/brotherlogic/recordsorganiser v0.0.0-20231020050744-8a355559b55a/go.mod h1:uSGrhzq3sVDk589TjThJB4WmuF9UXpsAIiQIywa7z54=
 github.com/brotherlogic/recordupdater v0.3.0/go.mod h1:6GB0xrq8j6n/YLUe3imHhUo9zLlIXklwogBgSkAtvpM=
 github.com/brotherlogic/recordwants v0.0.0-20210918164032-9da04d53cbf1/go.mod h1:IRkZBOav31NWTwWvMRVq3ttruarwBQe3ZWHslWjSmI4=
 github.com/brotherlogic/recordwants v0.0.0-20210918190859-49fa2a64cd32/go.mod h1:Y8JZ4SDM/W4+rQRQgjj89wG3AizbjYfNq5Bt9tltR8Q=
