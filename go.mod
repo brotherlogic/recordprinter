@@ -3,14 +3,14 @@ module github.com/brotherlogic/recordprinter
 go 1.16
 
 require (
-	github.com/brotherlogic/datastore v0.0.0-20231020052658-b2bd5c7f4f6b // indirect
+	github.com/brotherlogic/discovery v0.0.0-20231027110234-ab57292a6596 // indirect
 	github.com/brotherlogic/godiscogs v0.0.0-20230922000443-fb73651e941c
 	github.com/brotherlogic/goserver v0.0.0-20230726200050-779ae6811580
-	github.com/brotherlogic/keystore v0.0.0-20231014003010-9fa4578d12ad
-	github.com/brotherlogic/printqueue v0.39.0
-	github.com/brotherlogic/recordcollection v0.0.0-20231019051056-a4b21e81ca3d
-	github.com/brotherlogic/recordmover v0.0.0-20231019051428-de5c3d3f0945
-	github.com/brotherlogic/recordsorganiser v0.0.0-20231020050744-8a355559b55a
+	github.com/brotherlogic/keystore v0.0.0-20231021061208-13281c40a381
+	github.com/brotherlogic/printqueue v0.40.0
+	github.com/brotherlogic/recordcollection v0.0.0-20231024044144-7e352246adf0
+	github.com/brotherlogic/recordmover v0.0.0-20231026054844-c8ca57f08dfe
+	github.com/brotherlogic/recordsorganiser v0.0.0-20231020053845-db2a9e03aeec
 	github.com/golang/protobuf v1.5.3
 	golang.org/x/net v0.17.0
 	google.golang.org/grpc v1.59.0
