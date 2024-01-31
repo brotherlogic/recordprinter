@@ -69,6 +69,10 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 			return nil
 		}
 
+		if move.GetAfterContext().GetLocation() == "Sell" || move.GetAfterContext().GetLocation() == "Sold" {
+			return nil
+		}
+
 		record, err := s.bridge.getRecord(ctx, move.InstanceId)
 		if err != nil {
 			return fmt.Errorf("unable to get record: %w", err)
