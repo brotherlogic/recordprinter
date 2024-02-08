@@ -69,7 +69,8 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 			return nil
 		}
 
-		if move.GetAfterContext().GetLocation() == "Sell" || move.GetAfterContext().GetLocation() == "Sold" {
+		// Short cicruit on sell
+		if move.GetAfterContext().GetLocation() == "Sell" {
 			return nil
 		}
 
@@ -105,12 +106,8 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 
 				cleanToListen := strings.Contains(move.GetAfterContext().GetLocation(), "Listening") &&
 					strings.Contains(move.GetBeforeContext().GetLocation(), "Cleaning")
-				boxToPile := strings.Contains(move.GetAfterContext().GetLocation(), "Listening") &&
-					strings.Contains(move.GetBeforeContext().GetLocation(), "Listening")
-				intoHolding := strings.Contains(move.GetAfterContext().GetLocation(), "Holding") ||
-					strings.Contains(move.GetBeforeContext().GetLocation(), "Holding")
 
-				if !cleanToListen && !boxToPile && !intoHolding {
+				if !cleanToListen {
 					err = s.bridge.print(ctx, lines, move, true)
 					s.CtxLog(ctx, fmt.Sprintf("Printed %v -> %v", lines, err))
 					if err != nil {
