@@ -92,6 +92,11 @@ func (s *Server) move(ctx context.Context, move *pbrm.RecordMove) error {
 		addlines := s.buildMove(ctx, record, move)
 		lines = append(lines, addlines...)
 
+		if (move.GetBeforeContext().GetLocation() == "Holding" && move.GetAfterContext().GetLocation() == "Listening Pile") ||
+			(move.GetBeforeContext().GetLocation() == "Listening Pile" && move.GetAfterContext().GetLocation() == "Listening Box") {
+			pmove = false
+		}
+
 		// Don't print bandcamp moves, unless they're into digital
 		// Don't print moves to stale sales
 		// Don't print moves into library records
