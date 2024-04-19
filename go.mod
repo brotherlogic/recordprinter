@@ -12,7 +12,7 @@ require (
 	github.com/brotherlogic/recordmover v0.0.0-20240205082039-188c1ba18d2e
 	github.com/brotherlogic/recordsorganiser v0.0.0-20240206200112-27e54e8cc681
 	github.com/golang/protobuf v1.5.3
-	golang.org/x/net v0.20.0
+	golang.org/x/net v0.23.0
 	google.golang.org/grpc v1.61.0
 	google.golang.org/protobuf v1.33.0
 )
