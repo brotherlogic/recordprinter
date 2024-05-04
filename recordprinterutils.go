@@ -35,7 +35,7 @@ func (s *Server) buildMove(ctx context.Context, record *pbrc.Record, move *pbrm.
 	}
 
 	// If we're moving into the LP, use the before context
-	if move.GetAfterContext().GetLocation() == "Listening Pile" {
+	if move.GetAfterContext().GetLocation() == "Listening Pile" || move.GetBeforeContext().GetLocation() == "12 Inches" {
 		surrounds = move.GetBeforeContext()
 		s.CtxLog(ctx, fmt.Sprintf("MOVED: %v", move))
 	}
