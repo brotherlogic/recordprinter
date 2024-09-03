@@ -6,7 +6,7 @@ import (
 	rcpb "github.com/brotherlogic/recordcollection/proto"
 )
 
-//ClientUpdate on an updated record
+// ClientUpdate on an updated record
 func (s *Server) ClientUpdate(ctx context.Context, req *rcpb.ClientUpdateRequest) (*rcpb.ClientUpdateResponse, error) {
-	return &rcpb.ClientUpdateResponse{}, s.moveLoop(ctx, req.GetInstanceId())
+	return &rcpb.ClientUpdateResponse{}, nil
 }
