@@ -28,10 +28,10 @@ github.com/brotherlogic/monitor v0.0.0-20221025152653-c10877c5f9e6 h1:hxu2T9JspE
 github.com/brotherlogic/monitor v0.0.0-20221025152653-c10877c5f9e6/go.mod h1:babny4VO2GqFwjXqhJsP4a6la4XJeMT6f4BgLBPq4G8=
 github.com/brotherlogic/printqueue v0.42.0 h1:jfHSZgG4r2RCFRzGNqpbxactwKJpehbIShmZOT3TVdQ=
 github.com/brotherlogic/printqueue v0.42.0/go.mod h1:axLSRNex+YFQ3ocddeIlCyPMvHv5UbcptQHSksFYRNc=
-github.com/brotherlogic/recordcollection v0.0.0-20240927033702-9494b3eb6bbb h1:LcU9O1BLNU+gQIWotTHDe+EGAL6W4U+kAAp9tgc6a4A=
-github.com/brotherlogic/recordcollection v0.0.0-20240927033702-9494b3eb6bbb/go.mod h1:TDrz2TKWUKXvQOHLYFnqxiUpTHfEp5vYhjc2YfYRUpY=
-github.com/brotherlogic/recordmover v0.0.0-20241003223554-881a9962015d h1:Muw/NKi+dBeZU3E08wTG0FqhyguLIPMBL+B33JdJ+cU=
-github.com/brotherlogic/recordmover v0.0.0-20241003223554-881a9962015d/go.mod h1:0b6Z/qz4n442Z/t8cEl/xQNy+ng3YUlrkUx7fSsq/nE=
+github.com/brotherlogic/recordcollection v0.0.0-20241004034131-8fa296024260 h1:vF2zX6wyaKAzWuPZMQ3587dDv8tbKnY3mREbSgm5zB0=
+github.com/brotherlogic/recordcollection v0.0.0-20241004034131-8fa296024260/go.mod h1:q/aK2jgWjrb3RoTQghiNVpPdOUqdcwPc7yzyRKqL3xo=
+github.com/brotherlogic/recordmover v0.0.0-20241004040855-c1975bdd4abd h1:QB+tdOz/YzcFCdffz0bIxBXK3G/MNpoHad/95cMZKw8=
+github.com/brotherlogic/recordmover v0.0.0-20241004040855-c1975bdd4abd/go.mod h1:2nvsZr77/3w6MBkDo/EPLtDV2rTTiXD7N4fuBC3nDqM=
 github.com/brotherlogic/recordsorganiser v0.0.0-20240928002405-17eeaf3494e9 h1:/kabF0XZUDMAZ2ov8i0wOpHJ/qQLlnPV4cKprwPaAHQ=
 github.com/brotherlogic/recordsorganiser v0.0.0-20240928002405-17eeaf3494e9/go.mod h1:VGExcxqO+49LE5UYHS1DG0O8G0m6G1f0rde9+MIwZQg=
 github.com/brotherlogic/versionserver v0.0.0-20221025154054-c9bcd41be2f2 h1:YjFE4Sa+wwbl4yJwJaMQVeA4CMzLIDbbIuSMdsEp5/w=
