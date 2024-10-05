@@ -11,7 +11,7 @@ require (
 	github.com/brotherlogic/printqueue v0.42.0
 	github.com/brotherlogic/recordcollection v0.0.0-20241005003244-848176ce2e04
 	github.com/brotherlogic/recordmover v0.0.0-20241005003220-032051ef4d63
-	github.com/brotherlogic/recordsorganiser v0.0.0-20240928002405-17eeaf3494e9
+	github.com/brotherlogic/recordsorganiser v0.0.0-20241005003732-e793512b7dd0
 	github.com/golang/protobuf v1.5.4
 	golang.org/x/net v0.30.0
 	google.golang.org/grpc v1.67.1
