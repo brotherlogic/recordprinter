@@ -10,7 +10,7 @@ require (
 	github.com/brotherlogic/keystore v0.0.0-20240508161349-814b3200b126
 	github.com/brotherlogic/printqueue v0.42.0
 	github.com/brotherlogic/recordcollection v0.0.0-20241020224324-f20000227b28
-	github.com/brotherlogic/recordmover v0.0.0-20241019032138-fe27f6e4c95c
+	github.com/brotherlogic/recordmover v0.0.0-20241026040040-d697a339fac8
 	github.com/brotherlogic/recordsorganiser v0.0.0-20241019042047-e6fa4f0b0351
 	github.com/golang/protobuf v1.5.4
 	golang.org/x/net v0.30.0
