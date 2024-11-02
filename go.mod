@@ -11,7 +11,7 @@ require (
 	github.com/brotherlogic/printqueue v0.42.0
 	github.com/brotherlogic/recordcollection v0.0.0-20241020224324-f20000227b28
 	github.com/brotherlogic/recordmover v0.0.0-20241026040040-d697a339fac8
-	github.com/brotherlogic/recordsorganiser v0.0.0-20241019042047-e6fa4f0b0351
+	github.com/brotherlogic/recordsorganiser v0.0.0-20241026045925-4b3dc7610842
 	github.com/golang/protobuf v1.5.4
 	golang.org/x/net v0.30.0
 	google.golang.org/grpc v1.67.1
@@ -20,15 +20,15 @@ require (
 
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/brotherlogic/buildserver v0.0.0-20241019052424-57d6e0feaa55 // indirect
+	github.com/brotherlogic/buildserver v0.0.0-20241026060224-976226f2f769 // indirect
 	github.com/brotherlogic/datastore v0.0.0-20240830190304-3b849e438317 // indirect
-	github.com/brotherlogic/discovery v0.0.0-20241019174757-a28906468083 // indirect
-	github.com/brotherlogic/dstore v0.0.0-20241026013823-38e9869b97fb // indirect
-	github.com/brotherlogic/githubcard v0.0.0-20241023091508-a95f2a6114a8 // indirect
+	github.com/brotherlogic/discovery v0.0.0-20241026180659-08adb0a0063f // indirect
+	github.com/brotherlogic/dstore v0.0.0-20241102021053-fd51520579ab // indirect
+	github.com/brotherlogic/githubcard v0.0.0-20241030091844-71b771c63b17 // indirect
 	github.com/brotherlogic/githubridge v0.2802.0 // indirect
-	github.com/brotherlogic/gobuildslave v0.0.0-20241021044944-ed3bfbe748a3 // indirect
-	github.com/brotherlogic/lock v0.0.0-20241023092744-49dac34153c8 // indirect
-	github.com/brotherlogic/logging v0.0.0-20241019172747-671159a8153c // indirect
+	github.com/brotherlogic/gobuildslave v0.0.0-20241028082414-9168a2af79e3 // indirect
+	github.com/brotherlogic/lock v0.0.0-20241030095957-dcd4a11d2b3e // indirect
+	github.com/brotherlogic/logging v0.0.0-20241026174112-545acd4eaa02 // indirect
 	github.com/brotherlogic/monitor v0.0.0-20221025152653-c10877c5f9e6 // indirect
 	github.com/brotherlogic/versionserver v0.0.0-20221025154054-c9bcd41be2f2 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
