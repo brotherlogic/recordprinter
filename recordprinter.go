@@ -41,7 +41,7 @@ type Bridge interface {
 
 type prodBridge struct {
 	dial       func(ctx context.Context, server string) (*grpc.ClientConn, error)
-	raiseIssue func(name string, body string)
+	raiseIssue func(name string, body string, labels ...string)
 	pqc        *pqc.PrintQueueClient
 }
 
