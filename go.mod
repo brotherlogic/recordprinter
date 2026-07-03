@@ -1,6 +1,6 @@
 module github.com/brotherlogic/recordprinter
 
-go 1.24.4
+go 1.25.0
 
 require (
 	github.com/brotherlogic/godiscogs v0.0.0-20250429182651-404c7473edf8
@@ -11,7 +11,7 @@ require (
 	github.com/brotherlogic/recordmover v0.0.0-20250809014120-706b4f832357
 	github.com/brotherlogic/recordsorganiser v0.0.0-20250522071341-e94f0b2c7f87
 	github.com/golang/protobuf v1.5.4
-	golang.org/x/net v0.48.0
+	golang.org/x/net v0.55.0
 	google.golang.org/grpc v1.79.3
 	google.golang.org/protobuf v1.36.10
 )
@@ -37,7 +37,7 @@ require (
 	github.com/prometheus/common v0.65.0 // indirect
 	github.com/prometheus/procfs v0.17.0 // indirect
 	github.com/struCoder/pidusage v0.2.1 // indirect
-	golang.org/x/sys v0.39.0 // indirect
-	golang.org/x/text v0.32.0 // indirect
+	golang.org/x/sys v0.45.0 // indirect
+	golang.org/x/text v0.37.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251202230838-ff82c1b0f217 // indirect
 )
